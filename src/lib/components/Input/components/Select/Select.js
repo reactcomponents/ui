@@ -20,23 +20,6 @@ class Select extends Component {
     };
   }
 
-  componentDidUpdate() {
-    const selectedItem = document.querySelector('.Select__input__options__option[data-isselected="true"]');
-    if (selectedItem) {
-      const overflow = selectedItem.parentElement.parentElement;
-      const optionPos = selectedItem.offsetTop - overflow.offsetTop;
-      if (optionPos >= overflow.clientHeight) {
-        overflow.scrollTop += selectedItem.clientHeight + 1;
-      } else {
-        console.log(optionPos, overflow.clientHeight, overflow.scrollTop);
-        // overflow.scrollTop = optionPos;
-      }
-      // else if () {
-
-      // }
-    }
-  }
-
   handleInput = (event) => {
     event.preventDefault();
     const { value } = event.target;
@@ -73,10 +56,44 @@ class Select extends Component {
 
   handleKeyPress = (event) => {
     event.preventDefault();
-    if (event.charCode === 13) {
+    if (event.keyCode) {
       console.log('Enter');
       this.state.refs.select.current.blur();
     }
+  }
+
+  handleKeyDowm = (event) => {
+
+    const upKey = [37, 38].includes(event.keyCode);
+    const downKey = [39, 40].includes(event.keyCode);
+
+    const selectedItem = document.querySelector('.Select__input__options__option[data-isselected="true"]');
+
+    if (selectedItem) {
+      const { parentElement } = selectedItem.parentElement;
+
+      const pos = {
+        parentTop: parentElement.offsetTop,
+        parentBottom: parentElement.offsetTop + parentElement.clientHeight,
+        childTop: parentElement.offsetTop + selectedItem.offsetTop + (0 - parentElement.scrollTop),
+        childBottom: parentElement.offsetTop + selectedItem.offsetTop + (0 - parentElement.scrollTop) + selectedItem.clientHeight,
+      };
+
+      if (downKey) {
+        if (pos.childTop >= pos.parentBottom) {
+          const newScroll = ((pos.childTop - pos.parentTop) - (parentElement.clientHeight - (selectedItem.clientHeight + 1))) + parentElement.scrollTop;
+          parentElement.scrollTop = newScroll;
+        }
+      }
+
+      if (upKey) {
+        if (pos.childTop < pos.parentTop) {
+          parentElement.scrollTop = selectedItem.offsetTop;
+        }
+      }
+
+    }
+
   }
 
   toggleFocus = () => {
@@ -86,6 +103,7 @@ class Select extends Component {
       setTimeout(() => this.state.refs.select.current.focus(), 100);
     }
   }
+
 
   render() {
     return (
@@ -105,6 +123,7 @@ class Select extends Component {
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
               onKeyPress={this.handleKeyPress}
+              onKeyUp={this.handleKeyDowm}
             >
               <option value="">{this.state.placeholder}</option>
               {
