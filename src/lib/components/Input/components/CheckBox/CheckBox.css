@@ -1,3 +1,113 @@
 .CheckBox {
 
 }
+
+.CheckBox__label {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  word-spacing: 0.25px;
+  margin-bottom: 5px;
+  opacity: 0.75;
+}
+
+.CheckBoxOption {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.CheckBoxOption > label {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 35px;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.25px;
+  word-spacing: 0.25px;
+  cursor: pointer;
+}
+.CheckBoxOption__input__element {
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  width: 0;
+  height: 0;
+  max-width: 0;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.CheckBoxOption__icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+  border-radius: 4px;
+  box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
+  background-color: #e5e5e5;
+  overflow: hidden;
+  transition: background-color 0.25s linear 0s,
+    box-shadow 0.25s linear 0s;
+}
+.CheckBoxOption[data-ischecked="true"] .CheckBoxOption__icon {
+  box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
+  background-color: blue;
+  transition: background-color 0.25s linear 0s,
+    box-shadow 0.25s linear 0s;
+}
+.CheckBoxOption[data-isfocused="true"] .CheckBoxOption__icon {
+  box-shadow: inset 0px 0px 100px 0px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.25s linear 0s;
+}
+
+.CheckBoxOption__icon__tick {
+  position: absolute;
+  width: 150%;
+  height: 75%;
+  opacity: 0;
+  transform: scale(0.4) rotate(-45deg) translateX(10%) translateY(-20%);
+  transition: opacity 0.25s ease 0s;
+}
+.CheckBoxOption[data-ischecked="true"] .CheckBoxOption__icon__tick {
+  opacity: 1.0;
+}
+.CheckBoxOption__icon__tick > .line {
+  background-color: #ffffff;
+}
+.CheckBoxOption__icon__tick > .line:nth-child(1) {
+  width: 6px;
+  height: 0px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  transition: width 0s linear 0.15s,
+    height 0s linear 0.15s;
+}
+.CheckBoxOption[data-ischecked="true"] .CheckBoxOption__icon__tick > .line:nth-child(1) {
+  width: 6px;
+  height: 100%;
+  transition: width 0.25s linear 0s,
+    height 0.25s linear 0s;
+}
+.CheckBoxOption__icon__tick > .line:nth-child(2) {
+  position: relative;
+  top: -6px;
+  width: 0px;
+  height: 6px;
+  border-top-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  transition: width 0s linear 0.15s,
+    height 0s linear 0.15s;
+}
+.CheckBoxOption[data-ischecked="true"] .CheckBoxOption__icon__tick > .line:nth-child(2) {
+  width: 100%;
+  height: 6px;
+  transition: width 0.25s linear 0.15s,
+    height 0.25s linear 0.15s;
+}
