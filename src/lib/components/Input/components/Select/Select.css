@@ -1,13 +1,19 @@
 .Select {
   display: inline-block;
   vertical-align: middle;
+  position: relative;
   width: 100%;
+  height: 60px;
+  z-index: 1;
+}
+.Select[data-isfocused="true"] {
+  z-index: 9999;
 }
 .Select__label {
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.5px;
-  word-spacing: 0.5px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  word-spacing: 0.25px;
   margin-bottom: 5px;
   opacity: 0.75;
 }
@@ -93,8 +99,10 @@
 }
 
 .Select__input__options {
-  overflow: auto;
+  position: relative;
+  width: calc(100% - 2px);
   max-height: 0px;
+  overflow: auto;
   opacity: 1.0;
   transition: max-height 0.25s ease-in-out 0s,
     opacity 0.01s ease-in-out 0s;
