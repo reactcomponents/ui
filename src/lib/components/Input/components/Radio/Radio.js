@@ -7,6 +7,7 @@ class Radio extends Component {
     super(props);
     this.state = {
       id: Math.random().toString(36).substr(2, 9),
+      name: props.name,
       label: props.label || '',
       options: {},
       value: '',
@@ -59,8 +60,9 @@ class Radio extends Component {
     const { value } = event.target;
 
     this.setState({ value });
+
     if (typeof this.state.onChange === 'function') {
-      this.state.onChange(value);
+      this.state.onChange(this.state.name, value);
     }
   }
 

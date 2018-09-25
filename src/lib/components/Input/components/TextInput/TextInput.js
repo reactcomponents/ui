@@ -6,6 +6,7 @@ class TextInput extends Component {
     super(props);
     this.state = {
       id: Math.random().toString(36).substr(2, 9),
+      name: props.name,
       type: props.type,
       label: props.label,
       placeholder: props.placeholder,
@@ -25,6 +26,13 @@ class TextInput extends Component {
     this.setState({
       value: props.value,
     });
+  }
+
+  handleInput = (event) => {
+    event.preventDefault();
+    const { value } = event.target;
+
+    this.state.onChange(this.state.name, value);
   }
 
   handleFocus = () => {
@@ -63,7 +71,7 @@ class TextInput extends Component {
               ref={this.state.refs.input}
               placeholder={this.state.placeholder}
               value={this.state.value}
-              onChange={this.state.onChange}
+              onChange={this.handleInput}
               onFocus={this.handleFocus}
               onBlur={this.handleBlur}
             />

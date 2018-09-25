@@ -6,6 +6,7 @@ class Select extends Component {
     super(props);
     this.state = {
       id: Math.random().toString(36).substr(2, 9),
+      name: props.name,
       label: props.label || '',
       placeholder: props.placeholder,
       onChange: props.onChange,
@@ -23,16 +24,19 @@ class Select extends Component {
   handleInput = (event) => {
     event.preventDefault();
     const { value } = event.target;
+
     this.setState({ value });
+
     if (typeof this.state.onChange === 'function') {
-      this.state.onChange(value);
+      this.state.onChange(this.state.name, value);
     }
   }
 
   handleOptionChange = (value) => {
     this.setState({ value });
+
     if (typeof this.state.onChange === 'function') {
-      this.state.onChange(value);
+      this.state.onChange(this.state.name, value);
     }
   }
 
@@ -56,8 +60,7 @@ class Select extends Component {
 
   handleKeyPress = (event) => {
     event.preventDefault();
-    if (event.keyCode) {
-      console.log('Enter');
+    if (event.charCode === 13) {
       this.state.refs.select.current.blur();
     }
   }

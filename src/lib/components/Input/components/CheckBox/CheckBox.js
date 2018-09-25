@@ -7,6 +7,7 @@ class CheckBox extends Component {
     super(props);
     this.state = {
       id: Math.random().toString(36).substr(2, 9),
+      name: props.name,
       label: props.label || '',
       options: {},
       onChange: props.onChange,
@@ -57,7 +58,7 @@ class CheckBox extends Component {
     const { id, checked } = event.target;
     event.target.blur();
 
-    this.setState({
+    const newState = {
       options: {
         ...this.state.options,
         [id]: {
@@ -65,9 +66,12 @@ class CheckBox extends Component {
           isChecked: checked,
         },
       },
-    });
+    };
+
+    this.setState(newState);
+
     if (typeof this.state.onChange === 'function') {
-      this.state.onChange(this.state.options);
+      this.state.onChange(this.state.name, newState.options);
     }
   }
 
