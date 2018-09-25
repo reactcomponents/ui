@@ -1,3 +1,84 @@
 .Radio {
 
 }
+
+.Radio__label {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  word-spacing: 0.25px;
+  margin-bottom: 5px;
+  opacity: 0.75;
+}
+
+.RadioOption {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.RadioOption > label {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 35px;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.25px;
+  word-spacing: 0.25px;
+  cursor: pointer;
+}
+.RadioOption__input__element {
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  width: 0;
+  height: 0;
+  max-width: 0;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.RadioOption__icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform: scale(0.75);
+  transition: transform 0.25s ease 0s,
+    background-color 0.25s ease 0s,
+    box-shadow 0.25s ease 0s;
+}
+.RadioOption[data-ischecked="true"] .RadioOption__icon {
+  box-shadow: 0px 0px 0px 2px blue;
+  background-color: #ffffff;
+  transform: scale(0.85);
+  transition: transform 0.25s ease 0s,
+    background-color 0.25s ease 0s,
+    box-shadow 0.25s ease 0s;
+}
+.RadioOption[data-isfocused="true"][data-ischecked="true"] .RadioOption__icon {
+  box-shadow: 0px 0px 0px 0px #000,
+    0px 0px 0px 2px blue;
+  transition: box-shadow 0.25s ease 0s;
+}
+
+.RadioOption__icon > .circle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: blue;
+  transform: scale(0);
+}
+.RadioOption[data-ischecked="true"] .RadioOption__icon > .circle {
+  transform: scale(0.65);
+  transition: transform 0.25s ease-in-out 0s;
+}
