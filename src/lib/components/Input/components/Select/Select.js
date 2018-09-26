@@ -9,9 +9,11 @@ class Select extends Component {
       name: props.name,
       label: props.label || '',
       placeholder: props.placeholder,
-      onChange: props.onChange,
       options: props.options || [],
       value: '',
+      onChange: props.onChange,
+      __onChange: props.__onChange || (() => { }),
+      __onInit: props.__onInit || (() => { }),
       refs: {
         select: React.createRef(),
       },
@@ -19,6 +21,10 @@ class Select extends Component {
         isFocused: false,
       },
     };
+  }
+
+  componentWillMount() {
+    this.state.__onInit(this.state.name, this.state.value);
   }
 
   handleInput = (event) => {
@@ -30,6 +36,7 @@ class Select extends Component {
     if (typeof this.state.onChange === 'function') {
       this.state.onChange(this.state.name, value);
     }
+    this.state.__onChange(this.state.name, value);
   }
 
   handleOptionChange = (value) => {
@@ -38,6 +45,7 @@ class Select extends Component {
     if (typeof this.state.onChange === 'function') {
       this.state.onChange(this.state.name, value);
     }
+    this.state.__onChange(this.state.name, value);
   }
 
   handleFocus = () => {
