@@ -10,8 +10,10 @@ class TextInput extends Component {
       type: props.type,
       label: props.label,
       placeholder: props.placeholder,
-      onChange: props.onChange,
       value: props.value,
+      onChange: props.onChange,
+      __onChange: props.__onChange || (() => { }),
+      __onInit: props.__onInit || (() => { }),
       refs: {
         input: React.createRef(),
       },
@@ -22,36 +24,41 @@ class TextInput extends Component {
     };
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({
-      value: props.value,
-    });
+  componentWillMount() {
+    this.state.__onInit(this.state.name, this.state.value);
   }
 
   handleInput = (event) => {
     event.preventDefault();
     const { value } = event.target;
 
+    this.setState({ value });
+
     this.state.onChange(this.state.name, value);
+    this.state.__onChange(this.state.name, value);
   }
 
   handleFocus = () => {
-    this.setState({
-      status: {
-        ...this.state.status,
-        isFocused: true,
-      },
-    });
+    if (!this.state.status.isFocused) {
+      this.setState({
+        status: {
+          ...this.state.status,
+          isFocused: true,
+        },
+      });
+    }
     this.state.refs.input.current.focus();
   }
 
   handleBlur = () => {
-    this.setState({
-      status: {
-        ...this.state.status,
-        isFocused: false,
-      },
-    });
+    if (this.state.status.isFocused) {
+      this.setState({
+        status: {
+          ...this.state.status,
+          isFocused: false,
+        },
+      });
+    }
   }
 
   render() {
