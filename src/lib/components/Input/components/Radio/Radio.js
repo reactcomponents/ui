@@ -12,6 +12,8 @@ class Radio extends Component {
       options: {},
       value: '',
       onChange: props.onChange,
+      __onChange: props.__onChange || (() => { }),
+      __onInit: props.__onInit || (() => { }),
     };
   }
 
@@ -19,6 +21,8 @@ class Radio extends Component {
     this.setState({
       options: this.createOptions(this.props.options),
     });
+
+    this.state.__onInit(this.state.name, this.state.value);
   }
 
   createOptions = (options) => {
@@ -64,6 +68,7 @@ class Radio extends Component {
     if (typeof this.state.onChange === 'function') {
       this.state.onChange(this.state.name, value);
     }
+    this.state.__onChange(this.state.name, value);
   }
 
   render() {
