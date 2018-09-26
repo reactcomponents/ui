@@ -11,6 +11,8 @@ class CheckBox extends Component {
       label: props.label || '',
       options: {},
       onChange: props.onChange,
+      __onChange: props.__onChange || (() => { }),
+      __onInit: props.__onInit || (() => { }),
     };
   }
 
@@ -18,6 +20,8 @@ class CheckBox extends Component {
     this.setState({
       options: this.createOptions(this.props.options),
     });
+
+    this.state.__onInit(this.state.name, []);
   }
 
   createOptions = (options) => {
@@ -85,6 +89,7 @@ class CheckBox extends Component {
       }, []);
 
       this.state.onChange(this.state.name, value);
+      this.state.__onChange(this.state.name, value);
     }
   }
 
