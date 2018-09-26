@@ -67,11 +67,24 @@ class CheckBox extends Component {
         },
       },
     };
-
     this.setState(newState);
 
     if (typeof this.state.onChange === 'function') {
-      this.state.onChange(this.state.name, newState.options);
+
+      const value = Object.keys(newState.options).reduce((checkedValues, optionId) => {
+        const option = newState.options[optionId];
+
+        if (option.isChecked) {
+          return [
+            ...checkedValues,
+            option.value,
+          ];
+        }
+
+        return checkedValues;
+      }, []);
+
+      this.state.onChange(this.state.name, value);
     }
   }
 
