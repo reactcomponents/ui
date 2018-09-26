@@ -4,6 +4,8 @@ import './Form.css';
 class Form extends Component {
   constructor(props) {
     super(props);
+    this.input = {};
+    this.onSubmit = props.onSubmit;
     this.state = {
       data: {},
     };
@@ -20,14 +22,27 @@ class Form extends Component {
           ...newChild,
           props: {
             ...child.props,
-            __onChange: (name, value) => {
+            __onInit: (name, value) => {
+
+              this.input[name] = value;
+
               this.setState({
-                ...this.state,
+                data: {
+                  ...this.state.data,
+                  ...this.input,
+                },
+              });
+
+            },
+            __onChange: (name, value = null) => {
+
+              this.setState({
                 data: {
                   ...this.state.data,
                   [name]: value,
                 },
               });
+
             },
           },
         };
@@ -43,11 +58,35 @@ class Form extends Component {
 
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return false;
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (typeof this.onSubmit === 'function') {
+      this.onSubmit(this.state.data);
+    }
+  }
+
+  handleKeyDown = (event) => {
+    // IMPLEMENT
+    if (event.keyCode === 13) {
+      console.log(this.state.data);
+    }
+  }
+
   render() {
     return (
-      <div className="Form">
+      <form
+        className="Form"
+        onKeyDown={this.handleKeyDown}
+        onSubmit={this.handleSubmit}
+      >
         { this.children }
-      </div>
+        <input type="submit" />
+      </form>
     );
   }
 
