@@ -19,7 +19,12 @@ class Input extends Component {
       value: props.value || '',
       onChange: props.onChange || (() => { }),
       __onChange: props.__onChange || (() => { }),
+      __onInit: props.__onInit || (() => { }),
     };
+  }
+
+  componentWillMount() {
+    this.state.__onInit(this.state.name, this.state.value);
   }
 
   handleInput = (name, value) => {
