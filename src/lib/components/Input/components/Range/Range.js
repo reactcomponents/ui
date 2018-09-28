@@ -6,12 +6,23 @@ class Range extends Component {
     super(props);
     this.status = {
       isMouseDown: false,
-      rate: 0,
-      cursorX: 0,
-      startPosition: 0,
-      endPosition: 0,
       currentHandle: 'end',
       isOverlapped: false,
+    };
+    this.handle = {
+      current: null,
+      other: null,
+      offsetLeft: {
+        current: 0,
+        other: 0,
+      },
+      cursorX: 0,
+      correction: 0,
+    };
+    this.track = {
+      leftEnd: 0,
+      rightEnd: 0,
+      availableSpace: 0,
     };
     this.state = {
       min: 0,
@@ -22,6 +33,7 @@ class Range extends Component {
       },
       onChange: props.onChange || (() => {}),
       refs: {
+        track: React.createRef(),
         activeTrack: React.createRef(),
         startHandle: React.createRef(),
         endHandle: React.createRef(),
@@ -32,36 +44,78 @@ class Range extends Component {
     };
   }
 
-  handleMouseDown = (event) => {
+  setOverlapping = (status) => {
+    this.status.isOverlapped = status;
+    this.state.refs.track.current.setAttribute('data-isoverlapped', status);
+  }
+
+  init = () => {
+
+    const {
+      startHandle,
+      endHandle,
+    } = this.state.refs;
+
+    if (this.status.currentHandle === 'start') {
+      this.handle.current = startHandle.current;
+      this.handle.other = endHandle.current;
+    } else if (this.status.currentHandle === 'end') {
+      this.handle.current = endHandle.current;
+      this.handle.other = startHandle.current;
+    }
+
+    this.handle.correction = this.handle.current.clientWidth / 2;
+
+    this.handle.offsetLeft.current = this.handle.current.offsetLeft;
+    this.handle.offsetLeft.other = this.handle.other.offsetLeft;
+
+
+    const track = this.state.refs.track.current;
+
+    this.track.availableSpace = track.clientWidth;
+    this.track.leftEnd = 0 - this.handle.correction;
+    this.track.rightEnd = this.track.availableSpace + this.track.leftEnd;
+
+  }
+
+  handleDragStart = (event) => {
     if (event.type === 'mousedown') {
       event.preventDefault();
     } else if (event.type === 'touchstart') {
       event = event.touches[0];
     }
 
+
     this.status.isMouseDown = true;
-    this.status.currentHandle = event.target.getAttribute('data-handle-identifier') || event.target.parentElement.getAttribute('data-handle-identifier');
-    this.status.startPosition = this.state.refs.startHandle.current.offsetLeft;
-    this.status.endPosition = this.state.refs.endHandle.current.offsetLeft;
-    this.status.cursorX = event.clientX;
+    this.handle.cursorX = event.clientX;
 
-    window.addEventListener('mouseup', this.handleMouseUp);
-    window.addEventListener('mousemove', this.handleMouseMove);
+    this.status.currentHandle = event.target.getAttribute('data-handle-identifier') || 'end';
 
-    window.addEventListener('touchend', this.handleMouseUp);
-    window.addEventListener('touchmove', this.handleMouseMove);
+    this.init();
+
+
+    if (event.target.classList.contains('RangeBar') || event.target.classList.contains('RangeBar__track')) {
+      this.handleClickOnTrack(event);
+    }
+
+    window.addEventListener('mouseup', this.handleDragStop);
+    window.addEventListener('mousemove', this.handleDragMove);
+
+    window.addEventListener('touchend', this.handleDragStop);
+    window.addEventListener('touchmove', this.handleDragMove);
+
   };
 
-  handleMouseUp = (event) => {
+  handleDragStop = (event) => {
     event.preventDefault();
 
     this.state.isMouseDown = false;
 
-    window.removeEventListener('mouseup', this.handleMouseUp);
-    window.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('mouseup', this.handleDragStop);
+    window.removeEventListener('mousemove', this.handleDragMove);
 
-    window.removeEventListener('touchend', this.handleMouseUp);
-    window.removeEventListener('touchmove', this.handleMouseMove);
+    window.removeEventListener('touchend', this.handleDragStop);
+    window.removeEventListener('touchmove', this.handleDragMove);
 
     this.setState({
       status: {
@@ -71,132 +125,128 @@ class Range extends Component {
     });
   };
 
-  handleMouseMove = (event) => {
+  handleDragMove = (event) => {
     if (event.type === 'mousedown') {
       event.preventDefault();
     } else if (event.type === 'touchmove') {
       event = event.touches[0];
     }
 
-    let currentHandle;
-    let newPosition;
-    const delta = event.clientX - this.status.cursorX;
+    const delta = event.clientX - this.handle.cursorX;
 
-    if (this.status.currentHandle === 'start') {
-      currentHandle = this.state.refs.startHandle.current;
-      newPosition = this.status.startPosition + delta;
-    } else if (this.status.currentHandle === 'end') {
-      currentHandle = this.state.refs.endHandle.current;
-      newPosition = this.status.endPosition + delta;
-    }
+    let newPosition = this.handle.offsetLeft.current + delta;
 
-    const handleMargin = currentHandle.clientWidth / 2;
-    const maxSpace = currentHandle.parentElement.clientWidth;
+    const { correction } = this.handle;
 
-    const leftEnd = 0 - handleMargin;
-    const rightEnd = maxSpace - handleMargin;
+    const {
+      leftEnd,
+      rightEnd,
+      availableSpace,
+    } = this.track;
+
+    const otherHandle = this.handle.other;
 
     if (newPosition >= leftEnd && newPosition <= rightEnd) {
 
+      let isOverlapped = false;
+
       if (this.status.currentHandle === 'start') {
-
-        const otherHandle = this.state.refs.endHandle.current;
-        const otherHandlePosition = otherHandle.offsetLeft;
-
-        if (newPosition > otherHandlePosition) {
-          this.isOverlapped = true;
-          newPosition = (otherHandlePosition / maxSpace) * 100;
-        } else {
-          this.isOverlapped = false;
-          newPosition = (newPosition / maxSpace) * 100;
-        }
-
+        isOverlapped = (newPosition > otherHandle.offsetLeft);
       } else if (this.status.currentHandle === 'end') {
-
-        const otherHandle = this.state.refs.startHandle.current;
-        const otherHandlePosition = otherHandle.offsetLeft;
-
-        if (newPosition < otherHandlePosition) {
-          this.isOverlapped = true;
-          newPosition = (otherHandlePosition / maxSpace) * 100;
-        } else {
-          this.isOverlapped = false;
-          newPosition = (newPosition / maxSpace) * 100;
-        }
-
+        isOverlapped = (newPosition < otherHandle.offsetLeft);
       }
+
+      this.setOverlapping(isOverlapped);
+      newPosition = isOverlapped ? otherHandle.offsetLeft : newPosition;
 
     } else if (newPosition > rightEnd) {
 
-      if (!this.isOverlapped) {
-        newPosition = ((maxSpace - handleMargin) / maxSpace) * 100;
-      } else {
-
-        const otherHandle = this.state.refs.endHandle.current;
-        const otherHandlePosition = otherHandle.offsetLeft;
-
-        newPosition = (otherHandlePosition / maxSpace) * 100;
-
-      }
+      newPosition = this.status.isOverlapped ? otherHandle.offsetLeft : availableSpace - correction;
 
     } else if (newPosition < leftEnd) {
 
-      if (!this.isOverlapped) {
-        newPosition = 0 - ((handleMargin / maxSpace) * 100);
-      } else {
+      newPosition = this.status.isOverlapped ? otherHandle.offsetLeft : 0 - correction;
 
-        const otherHandle = this.state.refs.startHandle.current;
-        const otherHandlePosition = otherHandle.offsetLeft;
-
-        newPosition = (otherHandlePosition / maxSpace) * 100;
-
-      }
-    } else {
-      newPosition = (newPosition / maxSpace) * 100;
     }
 
-    const total = ((parseFloat(newPosition) / 100) * maxSpace) + handleMargin;
-    this.status.rate = (total / maxSpace) * 100;
-    
-    this.state.onChange(this.status.rate);
+    this.updateHandle(newPosition);
 
-    currentHandle.style.left = `${newPosition}%`;
+  }
 
+  updateHandle = (newPosition = null) => {
 
+    if (newPosition) {
 
+      const { availableSpace } = this.track;
+      const newPosPercent = (newPosition / availableSpace) * 100;
+
+      this.handle.current.style.left = `${newPosPercent}%`;
+
+      this.updateActiveTrack();
+
+    }
+
+  }
+
+  updateActiveTrack = () => {
+
+    const startHandle = this.state.refs.startHandle.current;
+    const endHandle = this.state.refs.endHandle.current;
     const activeTrack = this.state.refs.activeTrack.current;
 
-    const activeTrackLeft = ((this.state.refs.startHandle.current.offsetLeft + handleMargin) / maxSpace) * 100;
-    const activeTrackWidth = ((this.state.refs.endHandle.current.offsetLeft - this.state.refs.startHandle.current.offsetLeft) / maxSpace) * 100;
+    const { correction } = this.handle;
+    const { availableSpace } = this.track;
+
+    const activeTrackLeft = ((startHandle.offsetLeft + correction) / availableSpace) * 100;
+    const activeTrackWidth = ((endHandle.offsetLeft - startHandle.offsetLeft) / availableSpace) * 100;
 
     activeTrack.style.left = `${activeTrackLeft}%`;
     activeTrack.style.width = `${activeTrackWidth}%`;
 
+    const selectedRange = endHandle.offsetLeft - startHandle.offsetLeft;
+    const selectedRangePercent = (selectedRange / availableSpace) * 100;
 
+    this.state.onChange(selectedRangePercent);
 
-    this.state.refs.startHandle.current.setAttribute('data-isoverlapped', this.isOverlapped);
-    this.state.refs.endHandle.current.setAttribute('data-isoverlapped', this.isOverlapped);
-
-  };
+  }
 
   handleClickOnTrack = (event) => {
-    event.preventDefault();
-
-    if (!event.target.classList.contains('RangeBar')) {
-      return false;
+    if (event.type === 'mousedown') {
+      event.preventDefault();
+    } else if (event.type === 'touchstart') {
+      event = event.touches[0];
     }
+
+    this.setOverlapping(false);
 
     const startHandle = this.state.refs.startHandle.current;
     const endHandle = this.state.refs.endHandle.current;
 
-    const tapPos = (event.clientX - startHandle.parentElement.offsetLeft) - 18;
-    const newPosition = (tapPos / startHandle.parentElement.clientWidth) * 100;
+    const newPosition = event.clientX - (this.state.refs.track.current.offsetLeft + this.handle.correction);
+    const newPositionPercent = (newPosition / this.track.availableSpace) * 100;
 
-    if (tapPos < startHandle.offsetLeft) {
-      startHandle.style.left = `${newPosition}%`;
-    } else if (tapPos > endHandle.offsetLeft) {
-      endHandle.style.left = `${newPosition}%`;
+    if (newPosition < startHandle.offsetLeft) {
+      this.status.currentHandle = 'start';
+      startHandle.style.left = `${newPositionPercent}%`;
+    } else if (newPosition > endHandle.offsetLeft) {
+      this.status.currentHandle = 'end';
+      endHandle.style.left = `${newPositionPercent}%`;
+    } else {
+      const distanceFromStartHandle = Math.abs(newPosition - startHandle.offsetLeft);
+      const distanceFromEndHandle = Math.abs(newPosition - endHandle.offsetLeft);
+
+      if (distanceFromStartHandle < distanceFromEndHandle) {
+        this.status.currentHandle = 'start';
+        startHandle.style.left = `${newPositionPercent}%`;
+      } else {
+        this.status.currentHandle = 'end';
+        endHandle.style.left = `${newPositionPercent}%`;
+      }
     }
+
+    this.init();
+
+    this.updateActiveTrack();
 
     return true;
 
@@ -213,7 +263,13 @@ class Range extends Component {
           />
         </div>
         <div className="Range__input">
-          <div className="RangeBar" onMouseDown={this.handleClickOnTrack}>
+          <div
+            ref={this.state.refs.track}
+            className="RangeBar"
+            data-isoverlapped={this.state.status.isOverlapped}
+            onMouseDown={this.handleDragStart}
+            onTouchStart={this.handleDragStart}
+          >
             <div
               ref={this.state.refs.activeTrack}
               className="RangeBar__track"
@@ -221,22 +277,26 @@ class Range extends Component {
             <div
               ref={this.state.refs.startHandle}
               className="RangeBar__handle RangeBar__handle--start"
-              data-handle-identifier="start"
-              data-isoverlapped={this.state.status.isOverlapped}
-              onMouseDownCapture={this.handleMouseDown}
-              onTouchStartCapture={this.handleMouseDown}
             >
               <div className="RangeBar__handle__icon" />
+              <div
+                className="RangeBar__handle__event-target"
+                data-handle-identifier="start"
+                onMouseDown={this.handleDragStart}
+                onTouchStart={this.handleDragStart}
+              />
             </div>
             <div
               ref={this.state.refs.endHandle}
               className="RangeBar__handle RangeBar__handle--end"
-              data-handle-identifier="end"
-              data-isoverlapped={this.state.status.isOverlapped}
-              onMouseDownCapture={this.handleMouseDown}
-              onTouchStartCapture={this.handleMouseDown}
             >
               <div className="RangeBar__handle__icon" />
+              <div
+                className="RangeBar__handle__event-target"
+                data-handle-identifier="end"
+                onMouseDown={this.handleDragStart}
+                onTouchStart={this.handleDragStart}
+              />
             </div>
           </div>
         </div>
