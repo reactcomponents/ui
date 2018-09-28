@@ -24,14 +24,17 @@ class Range extends Component {
       rightEnd: 0,
       availableSpace: 0,
     };
+    this.value = {
+      start: 0,
+      end: 0,
+      total: 0,
+    };
     this.state = {
       min: 0,
       max: 100,
-      value: {
-        start: 0,
-        end: 0,
-      },
+      value: this.value,
       onChange: props.onChange || (() => {}),
+      onChangeWatch: props.onChangeWatch || (() => {}),
       refs: {
         track: React.createRef(),
         activeTrack: React.createRef(),
@@ -123,6 +126,9 @@ class Range extends Component {
         isOverlapped: this.status.isOverlapped,
       },
     });
+
+    this.state.onChange(this.value);
+
   };
 
   handleDragMove = (event) => {
@@ -203,10 +209,18 @@ class Range extends Component {
     activeTrack.style.left = `${activeTrackLeft}%`;
     activeTrack.style.width = `${activeTrackWidth}%`;
 
+
+    const startRangePercent = ((startHandle.offsetLeft + correction) / availableSpace) * 100;
+    const endRangePercent = ((endHandle.offsetLeft + correction) / availableSpace) * 100;
+
     const selectedRange = endHandle.offsetLeft - startHandle.offsetLeft;
     const selectedRangePercent = (selectedRange / availableSpace) * 100;
 
-    this.state.onChange(selectedRangePercent);
+    this.value.start = startRangePercent;
+    this.value.end = endRangePercent;
+    this.value.total = selectedRangePercent;
+
+    this.state.onChangeWatch(this.value);
 
   }
 
