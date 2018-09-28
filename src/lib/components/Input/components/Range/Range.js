@@ -32,6 +32,7 @@ class Range extends Component {
     this.state = {
       min: 0,
       max: 100,
+      type: props.type || 'slider',
       value: this.value,
       onChange: props.onChange || (() => {}),
       onChangeWatch: props.onChangeWatch || (() => {}),
@@ -70,7 +71,9 @@ class Range extends Component {
     this.handle.correction = this.handle.current.clientWidth / 2;
 
     this.handle.offsetLeft.current = this.handle.current.offsetLeft;
-    this.handle.offsetLeft.other = this.handle.other.offsetLeft;
+    if (this.state.type !== 'slider') {
+      this.handle.offsetLeft.other = this.handle.other.offsetLeft;
+    }
 
 
     const track = this.state.refs.track.current;
@@ -150,20 +153,25 @@ class Range extends Component {
       availableSpace,
     } = this.track;
 
+
     const otherHandle = this.handle.other;
 
     if (newPosition >= leftEnd && newPosition <= rightEnd) {
 
-      let isOverlapped = false;
+      if (this.state.type !== 'slider') {
 
-      if (this.status.currentHandle === 'start') {
-        isOverlapped = (newPosition > otherHandle.offsetLeft);
-      } else if (this.status.currentHandle === 'end') {
-        isOverlapped = (newPosition < otherHandle.offsetLeft);
+        let isOverlapped = false;
+
+        if (this.status.currentHandle === 'start') {
+          isOverlapped = (newPosition > otherHandle.offsetLeft);
+        } else if (this.status.currentHandle === 'end') {
+          isOverlapped = (newPosition < otherHandle.offsetLeft);
+        }
+
+        this.setOverlapping(isOverlapped);
+        newPosition = isOverlapped ? otherHandle.offsetLeft : newPosition;
+
       }
-
-      this.setOverlapping(isOverlapped);
-      newPosition = isOverlapped ? otherHandle.offsetLeft : newPosition;
 
     } else if (newPosition > rightEnd) {
 
@@ -174,6 +182,7 @@ class Range extends Component {
       newPosition = this.status.isOverlapped ? otherHandle.offsetLeft : 0 - correction;
 
     }
+
 
     this.updateHandle(newPosition);
 
@@ -203,22 +212,38 @@ class Range extends Component {
     const { correction } = this.handle;
     const { availableSpace } = this.track;
 
-    const activeTrackLeft = ((startHandle.offsetLeft + correction) / availableSpace) * 100;
-    const activeTrackWidth = ((endHandle.offsetLeft - startHandle.offsetLeft) / availableSpace) * 100;
+    let activeTrackLeft;
+    let activeTrackWidth;
+
+    if (this.state.type !== 'slider') {
+      activeTrackLeft = ((startHandle.offsetLeft + correction) / availableSpace) * 100;
+      activeTrackWidth = ((endHandle.offsetLeft - startHandle.offsetLeft) / availableSpace) * 100;
+    } else {
+      activeTrackLeft = 0;
+      activeTrackWidth = ((endHandle.offsetLeft + correction) / availableSpace) * 100;
+    }
 
     activeTrack.style.left = `${activeTrackLeft}%`;
     activeTrack.style.width = `${activeTrackWidth}%`;
 
 
-    const startRangePercent = ((startHandle.offsetLeft + correction) / availableSpace) * 100;
-    const endRangePercent = ((endHandle.offsetLeft + correction) / availableSpace) * 100;
+    if (this.state.type !== 'slider') {
+      const startRangePercent = ((startHandle.offsetLeft + correction) / availableSpace) * 100;
+      const endRangePercent = ((endHandle.offsetLeft + correction) / availableSpace) * 100;
 
-    const selectedRange = endHandle.offsetLeft - startHandle.offsetLeft;
-    const selectedRangePercent = (selectedRange / availableSpace) * 100;
+      const selectedRange = endHandle.offsetLeft - startHandle.offsetLeft;
+      const selectedRangePercent = (selectedRange / availableSpace) * 100;
 
-    this.value.start = startRangePercent;
-    this.value.end = endRangePercent;
-    this.value.total = selectedRangePercent;
+      this.value.start = startRangePercent;
+      this.value.end = endRangePercent;
+      this.value.total = selectedRangePercent;
+    } else {
+      const totalRangePercent = ((endHandle.offsetLeft + correction) / availableSpace) * 100;
+
+      this.value.start = 0;
+      this.value.end = totalRangePercent;
+      this.value.total = totalRangePercent;
+    }
 
     this.state.onChangeWatch(this.value);
 
@@ -239,23 +264,32 @@ class Range extends Component {
     const newPosition = event.clientX - (this.state.refs.track.current.offsetLeft + this.handle.correction);
     const newPositionPercent = (newPosition / this.track.availableSpace) * 100;
 
-    if (newPosition < startHandle.offsetLeft) {
-      this.status.currentHandle = 'start';
-      startHandle.style.left = `${newPositionPercent}%`;
-    } else if (newPosition > endHandle.offsetLeft) {
-      this.status.currentHandle = 'end';
-      endHandle.style.left = `${newPositionPercent}%`;
-    } else {
-      const distanceFromStartHandle = Math.abs(newPosition - startHandle.offsetLeft);
-      const distanceFromEndHandle = Math.abs(newPosition - endHandle.offsetLeft);
+    if (this.state.type !== 'slider') {
 
-      if (distanceFromStartHandle < distanceFromEndHandle) {
+      if (newPosition < startHandle.offsetLeft) {
         this.status.currentHandle = 'start';
         startHandle.style.left = `${newPositionPercent}%`;
-      } else {
+      } else if (newPosition > endHandle.offsetLeft) {
         this.status.currentHandle = 'end';
         endHandle.style.left = `${newPositionPercent}%`;
+      } else {
+        const distanceFromStartHandle = Math.abs(newPosition - startHandle.offsetLeft);
+        const distanceFromEndHandle = Math.abs(newPosition - endHandle.offsetLeft);
+
+        if (distanceFromStartHandle < distanceFromEndHandle) {
+          this.status.currentHandle = 'start';
+          startHandle.style.left = `${newPositionPercent}%`;
+        } else {
+          this.status.currentHandle = 'end';
+          endHandle.style.left = `${newPositionPercent}%`;
+        }
       }
+
+    } else {
+
+      this.status.currentHandle = 'end';
+      endHandle.style.left = `${newPositionPercent}%`;
+
     }
 
     this.init();
@@ -288,18 +322,23 @@ class Range extends Component {
               ref={this.state.refs.activeTrack}
               className="RangeBar__track"
             />
-            <div
-              ref={this.state.refs.startHandle}
-              className="RangeBar__handle RangeBar__handle--start"
-            >
-              <div className="RangeBar__handle__icon" />
-              <div
-                className="RangeBar__handle__event-target"
-                data-handle-identifier="start"
-                onMouseDown={this.handleDragStart}
-                onTouchStart={this.handleDragStart}
-              />
-            </div>
+            {
+              this.state.type !== 'slider'
+                ? (
+                  <div
+                    ref={this.state.refs.startHandle}
+                    className="RangeBar__handle RangeBar__handle--start"
+                  >
+                    <div className="RangeBar__handle__icon" />
+                    <div
+                      className="RangeBar__handle__event-target"
+                      data-handle-identifier="start"
+                      onMouseDown={this.handleDragStart}
+                      onTouchStart={this.handleDragStart}
+                    />
+                  </div>
+                ) : null
+            }
             <div
               ref={this.state.refs.endHandle}
               className="RangeBar__handle RangeBar__handle--end"
