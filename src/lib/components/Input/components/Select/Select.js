@@ -1,21 +1,26 @@
 import React, { Component } from 'react';
 import './Select.css';
+import { Input } from '../../../..';
 
 class Select extends Component {
   constructor(props) {
     super(props);
+    this.lastKey = false;
     this.state = {
       id: Math.random().toString(36).substr(2, 9),
       name: props.name,
       label: props.label || '',
       placeholder: props.placeholder,
       options: props.options || [],
+      query: '',
       value: '',
+      valueIndex: -1,
       onChange: props.onChange,
       __onChange: props.__onChange || (() => { }),
       __onInit: props.__onInit || (() => { }),
       refs: {
-        select: React.createRef(),
+        input: React.createRef(),
+        options: React.createRef(),
       },
       status: {
         isFocused: false,
@@ -27,11 +32,45 @@ class Select extends Component {
     this.state.__onInit(this.state.name, this.state.value);
   }
 
+  componentDidUpdate() {
+    this.handleScroll();
+  }
+
+  handleScroll = () => {
+
+    const options = this.state.refs.options.current;
+    const boxHeight = options.parentElement.clientHeight;
+    const selectedOption = options.querySelector('[data-isselected="true"]');
+
+    if (selectedOption) {
+
+      const { offsetTop, clientHeight } = selectedOption;
+
+      if (this.lastKey === 'down') {
+
+        if (offsetTop >= boxHeight) {
+          options.parentElement.scrollTop = (offsetTop + clientHeight) - boxHeight;
+        }
+
+      } else if (this.lastKey === 'up') {
+
+        if (offsetTop < options.parentElement.scrollTop) {
+          options.parentElement.scrollTop = offsetTop;
+        }
+
+      }
+
+    }
+
+  }
+
   handleInput = (event) => {
     event.preventDefault();
     const { value } = event.target;
 
-    this.setState({ value });
+    this.setState({
+      query: value,
+    });
 
     if (typeof this.state.onChange === 'function') {
       this.state.onChange(this.state.name, value);
@@ -39,13 +78,30 @@ class Select extends Component {
     this.state.__onChange(this.state.name, value);
   }
 
-  handleOptionChange = (value) => {
-    this.setState({ value });
+  handleOptionChange = (valueIndex) => {
+    const value = this.state.options[valueIndex] || '';
+
+    this.setState({
+      query: value,
+      value,
+      valueIndex,
+    });
 
     if (typeof this.state.onChange === 'function') {
       this.state.onChange(this.state.name, value);
     }
     this.state.__onChange(this.state.name, value);
+  }
+
+  toggleFocusOnMouseDown = (event) => {
+    if (!this.state.status.isFocused) {
+      event.target.addEventListener('mouseup', this.toggleFocusOnMouseUp);
+    }
+  }
+
+  toggleFocusOnMouseUp = (event) => {
+    this.state.refs.input.current.focus();
+    event.target.removeEventListener('mouseup', this.toggleFocusOnMouseUp);
   }
 
   handleFocus = () => {
@@ -66,55 +122,43 @@ class Select extends Component {
     });
   }
 
-  handleKeyPress = (event) => {
-    event.preventDefault();
-    if (event.charCode === 13) {
-      this.state.refs.select.current.blur();
+  handleArrowKeys = (upKey, downKey) => {
+
+    let newIndex = this.state.valueIndex;
+
+    if (upKey) {
+      if (newIndex > -1) {
+        newIndex -= 1;
+      }
+    } else if (downKey) {
+      if (newIndex < (this.state.options.length - 1)) {
+        newIndex += 1;
+      }
     }
+
+    this.handleOptionChange(newIndex);
+
   }
 
-  handleKeyDowm = (event) => {
+  handleKeyDown = (event) => {
 
     const upKey = [37, 38].includes(event.keyCode);
     const downKey = [39, 40].includes(event.keyCode);
+    const enterKey = event.keyCode === 13;
+    const escKey = event.keyCode === 27;
 
-    const selectedItem = document.querySelector('.Select__input__options__option[data-isselected="true"]');
-
-    if (selectedItem) {
-      const { parentElement } = selectedItem.parentElement;
-
-      const pos = {
-        parentTop: parentElement.offsetTop,
-        parentBottom: parentElement.offsetTop + parentElement.clientHeight,
-        childTop: parentElement.offsetTop + selectedItem.offsetTop + (0 - parentElement.scrollTop),
-        childBottom: parentElement.offsetTop + selectedItem.offsetTop + (0 - parentElement.scrollTop) + selectedItem.clientHeight,
-      };
-
-      if (downKey) {
-        if (pos.childTop >= pos.parentBottom) {
-          const newScroll = ((pos.childTop - pos.parentTop) - (parentElement.clientHeight - (selectedItem.clientHeight + 1))) + parentElement.scrollTop;
-          parentElement.scrollTop = newScroll;
-        }
-      }
-
-      if (upKey) {
-        if (pos.childTop < pos.parentTop) {
-          parentElement.scrollTop = selectedItem.offsetTop;
-        }
-      }
-
+    if (upKey || downKey) {
+      this.lastKey = upKey ? 'up' : 'down';
+      this.handleArrowKeys(upKey, downKey);
+    } else if (enterKey) {
+      event.preventDefault();
+      this.state.refs.input.current.blur();
+    } else if (escKey) {
+      event.preventDefault();
+      this.state.refs.input.current.blur();
     }
 
   }
-
-  toggleFocus = () => {
-    if (this.state.status.isFocused) {
-      this.state.refs.select.current.blur();
-    } else {
-      setTimeout(() => this.state.refs.select.current.focus(), 100);
-    }
-  }
-
 
   render() {
     return (
@@ -123,49 +167,42 @@ class Select extends Component {
         data-isfocused={this.state.status.isFocused}
         data-isselected={this.state.value !== ''}
       >
-        <label htmlFor={this.state.id}>
-          <div className="Select__label">{this.state.label}</div>
-          <div className="Select__input__element">
-            <select
-              id={this.state.id}
-              ref={this.state.refs.select}
-              value={this.state.value}
-              onChange={this.handleInput}
-              onFocus={this.handleFocus}
-              onBlur={this.handleBlur}
-              onKeyPress={this.handleKeyPress}
-              onKeyUp={this.handleKeyDowm}
-            >
-              <option value="">{this.state.placeholder}</option>
-              {
-                this.state.options.map((option, index) => {
-                  return <option key={this.state.id + index} value={option}>{option}</option>;
-                })
-              }
-            </select>
-          </div>
-        </label>
-
-        <div className="Select__input">
-          <div className="Select__input__current" onMouseDown={this.toggleFocus}>
-            <div className="text">
-              {
-                this.state.value === ''
-                  ? this.state.placeholder
-                  : this.state.value
-              }
-            </div>
+        <div className="Select__overlay">
+          <div className="Select__overlay__color Select__overlay__color--dark" />
+          <div className="Select__overlay__color Select__overlay__color--white" />
+        </div>
+        <label htmlFor={this.state.id} className="Select__label">{this.state.label}</label>
+        <div
+          className="Select__input"
+          data-isfocused={this.state.status.isFocused}
+        >
+          <input
+            type={this.state.type}
+            id={this.state.id}
+            ref={this.state.refs.input}
+            placeholder={this.state.placeholder}
+            value={this.state.query}
+            onChange={this.handleInput}
+            onFocus={this.handleFocus}
+            onBlur={this.handleBlur}
+            onKeyDown={this.handleKeyDown}
+          />
+          <div className="Select__input__icon" onMouseDown={this.toggleFocusOnMouseDown}>
             <div className="icon" />
           </div>
-          <div className="Select__input__options">
-            <div className="Select__input__options__holder">
+        </div>
+
+        <div className="Select__options">
+          <div className="Select__options__overflow">
+            <div className="Select__options__holder" ref={this.state.refs.options}>
               {
                 this.state.options.map((option, index) => (
                   <div
-                    className="Select__input__options__option"
+                    className="Select__options__item"
                     key={this.state.id + index}
-                    data-isselected={this.state.value === option}
-                    onMouseDown={() => this.handleOptionChange(option)}
+                    data-index={index}
+                    data-isselected={this.state.valueIndex === index}
+                    onMouseDown={() => this.handleOptionChange(index)}
                   >
                     {option}
                   </div>
