@@ -13,6 +13,7 @@ class Select extends Component {
       placeholder: props.placeholder,
       options: props.options || [],
       availableOptions: props.options || [],
+      availableOptionsHeight: '225px',
       query: '',
       value: '',
       valueIndex: -1,
@@ -79,9 +80,16 @@ class Select extends Component {
       return optionsList;
     }, []);
 
+    let availableOptionsHeight = '225px';
+
+    if ((availableOptions.length * 45) < 225) {
+      availableOptionsHeight = `${availableOptions.length * 45}px`;
+    }
+
     this.setState({
       query: value,
       availableOptions,
+      availableOptionsHeight,
     });
 
     if (typeof this.state.onChange === 'function') {
@@ -210,7 +218,7 @@ class Select extends Component {
           <div 
             className="Select__options__overflow"
             style={{
-              height: `${this.state.availableOptions.length * 45}px`,
+              height: this.state.availableOptionsHeight,
             }}
           >
             <div className="Select__options__holder" ref={this.state.refs.options}>
