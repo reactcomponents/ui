@@ -12,6 +12,7 @@ class Select extends Component {
       label: props.label || '',
       placeholder: props.placeholder,
       options: props.options || [],
+      availableOptions: props.options || [],
       query: '',
       value: '',
       valueIndex: -1,
@@ -68,8 +69,19 @@ class Select extends Component {
     event.preventDefault();
     const { value } = event.target;
 
+    const availableOptions = this.state.options.reduce((optionsList, option) => {
+      if (option.toLowerCase().includes(value.toLowerCase())) {
+        return [
+          ...optionsList,
+          option,
+        ];
+      }
+      return optionsList;
+    }, []);
+
     this.setState({
       query: value,
+      availableOptions,
     });
 
     if (typeof this.state.onChange === 'function') {
@@ -115,6 +127,8 @@ class Select extends Component {
 
   handleBlur = () => {
     this.setState({
+      query: this.state.value,
+      availableOptions: this.state.options,
       status: {
         ...this.state.status,
         isFocused: false,
@@ -193,10 +207,15 @@ class Select extends Component {
         </div>
 
         <div className="Select__options">
-          <div className="Select__options__overflow">
+          <div 
+            className="Select__options__overflow"
+            style={{
+              height: `${this.state.availableOptions.length * 45}px`,
+            }}
+          >
             <div className="Select__options__holder" ref={this.state.refs.options}>
               {
-                this.state.options.map((option, index) => (
+                this.state.availableOptions.map((option, index) => (
                   <div
                     className="Select__options__item"
                     key={this.state.id + index}
