@@ -30,12 +30,13 @@ class Range extends Component {
       total: 0,
     };
     this.state = {
-      min: 0,
-      max: 100,
+      name: props.name,
       type: props.type || 'slider',
       value: this.value,
       onChange: props.onChange || (() => {}),
       onChangeWatch: props.onChangeWatch || (() => {}),
+      __onChange: props.__onChange || (() => { }),
+      __onInit: props.__onInit || (() => { }),
       refs: {
         track: React.createRef(),
         activeTrack: React.createRef(),
@@ -46,6 +47,10 @@ class Range extends Component {
         isOverlapped: false,
       },
     };
+  }
+
+  componentWillMount() {
+    this.state.__onInit(this.state.name, this.state.value);
   }
 
   setOverlapping = (status) => {
@@ -124,6 +129,7 @@ class Range extends Component {
     window.removeEventListener('touchmove', this.handleDragMove);
 
     this.setState({
+      value: this.value,
       status: {
         ...this.state.status,
         isOverlapped: this.status.isOverlapped,
@@ -131,6 +137,7 @@ class Range extends Component {
     });
 
     this.state.onChange(this.value);
+    this.state.__onChange(this.state.name, this.value);
 
   };
 
