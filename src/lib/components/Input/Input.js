@@ -5,6 +5,7 @@ import {
   Select,
   CheckBox,
   Radio,
+  Range,
 } from '../..';
 
 class Input extends Component {
@@ -18,6 +19,7 @@ class Input extends Component {
       options: props.options || [],
       value: props.value || '',
       onChange: props.onChange || (() => { }),
+      onChangeWatch: props.onChangeWatch || (() => { }),
       __onChange: props.__onChange || (() => { }),
       __onInit: props.__onInit || (() => { }),
     };
@@ -46,6 +48,8 @@ class Input extends Component {
       'select',
       'checkbox',
       'radio',
+      'range',
+      'slider',
     ];
 
     if (!allowedTypes.includes(this.state.type)) {
@@ -81,6 +85,26 @@ class Input extends Component {
             label={this.state.label}
             options={this.state.options}
             onChange={this.handleInput}
+          />
+        );
+
+      case 'range':
+        return (
+          <Range
+            type="range"
+            name={this.state.name}
+            onChange={this.handleInput}
+            onChangeWatch={this.state.onChangeWatch}
+          />
+        );
+
+      case 'slider':
+        return (
+          <Range
+            type="slider"
+            name={this.state.name}
+            onChange={this.handleInput}
+            onChangeWatch={this.state.onChangeWatch}
           />
         );
 
