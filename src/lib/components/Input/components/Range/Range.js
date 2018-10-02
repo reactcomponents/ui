@@ -120,7 +120,7 @@ class Range extends Component {
   handleDragStop = (event) => {
     event.preventDefault();
 
-    this.state.isMouseDown = false;
+    this.status.isMouseDown = false;
 
     window.removeEventListener('mouseup', this.handleDragStop);
     window.removeEventListener('mousemove', this.handleDragMove);
@@ -136,7 +136,7 @@ class Range extends Component {
       },
     });
 
-    this.state.onChange(this.value);
+    this.state.onChange(this.state.name, this.value);
     this.state.__onChange(this.state.name, this.value);
 
   };
@@ -252,7 +252,7 @@ class Range extends Component {
       this.value.total = totalRangePercent;
     }
 
-    this.state.onChangeWatch(this.value);
+    this.state.onChangeWatch(this.state.name, this.value);
 
   }
 
