@@ -1,6 +1,14 @@
 .Range {
 
 }
+.Range__label {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  word-spacing: 0.25px;
+  margin-bottom: 5px;
+  opacity: 0.75;
+}
 .Range__input__element {
   position: fixed;
   top: -100px;
@@ -19,7 +27,7 @@
   position: relative;
   height: 10px;
   padding: 0px 0px;
-  margin: 20px 10px;
+  margin: 15px 10px;
   border-radius: 5px;
   background-color: #dddddd;
 }

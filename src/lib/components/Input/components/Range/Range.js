@@ -30,8 +30,9 @@ class Range extends Component {
       total: 0,
     };
     this.state = {
-      name: props.name,
       type: props.type || 'slider',
+      name: props.name,
+      label: props.label || '',
       value: this.value,
       onChange: props.onChange || (() => {}),
       onChangeWatch: props.onChangeWatch || (() => {}),
@@ -310,6 +311,7 @@ class Range extends Component {
   render() {
     return (
       <div className="Range">
+        <label htmlFor={this.state.id} className="Range__label">{this.state.label}</label>
         <div className="Range__input__element">
           <input
             type="range"
