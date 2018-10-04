@@ -98,7 +98,7 @@ class Select extends Component {
   }
 
   handleOptionChange = (valueIndex) => {
-    const value = this.state.options[valueIndex] || '';
+    const value = this.state.availableOptions[valueIndex] || '';
 
     this.setState({
       query: value,
@@ -152,7 +152,7 @@ class Select extends Component {
         newIndex -= 1;
       }
     } else if (downKey) {
-      if (newIndex < (this.state.options.length - 1)) {
+      if (newIndex < (this.state.availableOptions.length - 1)) {
         newIndex += 1;
       }
     }
