@@ -1,0 +1,160 @@
+.Modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 99999999;
+}
+.Modal[data-type="INPUT"],
+.Modal[data-type="ERROR"],
+.Modal[data-type="WARN"] {
+  align-items: flex-start;
+}
+.Modal[data-align="TOP"] {
+  align-items: flex-start;
+}
+.Modal[data-align="BOTTOM"] {
+  align-items: flex-end;
+}
+.Modal[data-align="CENTER"] {
+  align-items: center;
+}
+
+.Modal[data-visible="false"] {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out 0.25s, visibility 0s ease-in-out 0.5s;
+}
+.Modal[data-visible="true"] {
+  visibility: visible;
+  opacity: 1.0;
+  transition: opacity 0.25s ease-in-out 0s, visibility 0s ease-in-out 0s;
+}
+
+.Modal__bg {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  cursor: default;
+  z-index: 1;
+}
+.Modal[data-visible="false"] .Modal__bg {
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out 0.25s;
+}
+.Modal[data-visible="true"] .Modal__bg {
+  opacity: 1.0;
+  transition: opacity 0.25s ease-in-out 0s;
+}
+
+.Modal__content {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  cursor: default;
+  z-index: 2;
+}
+.Modal[data-visible="false"] .Modal__content {
+  opacity: 0;
+  transform: scale(0.75) translateY(-100px);
+  transition: opacity 0.25s ease-in-out 0s, transform 0.25s ease-in-out 0.25s;
+}
+.Modal[data-visible="true"] .Modal__content {
+  opacity: 1.0;
+  transform: scale(1) translateY(0px);
+  transition: opacity 0.25s ease-in-out 0s, transform 0.25s ease-in-out 0s;
+}
+
+.Modal__content__box {
+  width: 100%;
+  margin: 5px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.Modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 40px;
+  background-color: blue;
+}
+.Modal[data-type="ERROR"] .Modal__header {
+  background-color: rgba(211, 47, 47, 1.0);
+}
+.Modal[data-type="WARN"] .Modal__header {
+  background-color: rgba(255, 152, 0, 1.0);
+}
+.Modal__header__title {
+  color: #fff;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  margin-left: 20px;
+}
+.Modal[data-type="ERROR"] .Modal__header__title {
+  font-weight: 700;
+}
+.Modal[data-type="WARN"] .Modal__header__title {
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+}
+
+.Modal__header-dupe {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  height: 40px;
+  margin-bottom: -40px;
+  z-index: 2;
+}
+.Modal__close-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.Modal__close-button > .icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  transform: scale(0.35);
+  transition: transform 0.15s ease-in-out 0s;
+}
+.Modal__close-button:active > .icon {
+  transform: scale(0.5);
+}
+.Modal__close-button > .icon > .line {
+  position: absolute;
+  top: 0px;
+  width: 3px;
+  height: 40px;
+  background-color: #fff;
+}
+.Modal__close-button > .icon > .line:nth-child(1) {
+  transform: rotate(-45deg);
+}
+.Modal__close-button > .icon > .line:nth-child(2) {
+  transform: rotate(45deg);
+}
+.Modal[data-type="WARN"] .Modal__close-button > .icon > .line {
+  background-color: #000;
+}
+.Modal__header-dupe .Modal__close-button > .icon > .line {
+  background-color: #000;
+}
