@@ -1,0 +1,33 @@
+.CurrentDateInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  color: #fff;
+  min-height: 100px;
+  padding-left: 15px;
+  background-color: blue;
+}
+.CurrentDateInfo__date {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+}
+.CurrentDateInfo__date__part {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 3px 3px;
+  margin: 2px 2px;
+  border-radius: 3px;
+}
+.CurrentDateInfo__day {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-align: center;
+  text-transform: uppercase;
+  margin-left: 7px;
+}
