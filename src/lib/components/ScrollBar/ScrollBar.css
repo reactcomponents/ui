@@ -1,0 +1,25 @@
+.ScrollBar {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 10px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.ScrollBar__track {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 10px;
+  height: 100%;
+}
+.ScrollBar__thumb {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 10px;
+  height: 0%;
+  background-color: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
