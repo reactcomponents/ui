@@ -9,6 +9,7 @@ class ScrollBar extends Component {
 
     this.startClientY = 0;
     this.startThumbTop = 0;
+    this.startScrollTop = 0;
     this.newTop = 0;
 
     this.scrollbar = null;
@@ -47,6 +48,7 @@ class ScrollBar extends Component {
     this.isMouseDown = true;
     this.startClientY = event.clientY;
     this.startThumbTop = this.thumb.offsetTop;
+    this.startScrollTop = this.overflow.scrollTop;
 
     window.addEventListener('mousemove', this.scroll);
     window.addEventListener('mouseup', this.endScroll);
@@ -84,7 +86,6 @@ class ScrollBar extends Component {
     const delta = this.startThumbTop + (event.clientY - this.startClientY);
 
     this.moveThumb(delta);
-    this.scrollContent(this.newTop);
   }
 
   handleScroll = () => {
@@ -92,7 +93,7 @@ class ScrollBar extends Component {
     const availableThumb = this.scrollbar.clientHeight - this.thumb.clientHeight;
     const newThumbPos = (this.overflow.scrollTop / availableScroll) * availableThumb;
 
-    this.moveThumb(newThumbPos);
+    this.moveThumb(newThumbPos, false);
   }
 
   handleClick = (event) => {
@@ -102,29 +103,79 @@ class ScrollBar extends Component {
       event = event.touches[0];
     }
 
+    this.startThumbTop = this.thumb.offsetTop;
+    this.startScrollTop = this.overflow.scrollTop;
+
     const clickY = event.clientY - this.scrollbar.getBoundingClientRect().top;
     const newThumbPos = clickY - (this.thumb.clientHeight / 2);
 
-    this.moveThumb(newThumbPos);
-    this.scrollContent(this.newTop);
+    this.smoothScroll(newThumbPos);
   }
 
-  moveThumb = (position) => {
+  moveThumb = (position, isContentScrollEnabled = true) => {
     const posMin = 0;
-    const posMax = 250 - this.thumb.clientHeight;
+    const posMax = this.scrollbar.clientHeight - this.thumb.clientHeight;
 
     this.newTop = (position <= posMin) ? posMin : position;
     this.newTop = (position > posMax) ? posMax : this.newTop;
 
     this.thumb.style.top = `${this.newTop}px`;
-    // console.log(position);
+
+    if (isContentScrollEnabled) {
+      this.scrollContent(this.newTop);
+    }
   }
 
   scrollContent = (position) => {
     const availableScroll = this.overflow.scrollHeight - this.overflow.clientHeight;
     const availableThumb = this.scrollbar.clientHeight - this.thumb.clientHeight;
 
-    this.overflow.scrollTop = (position / availableThumb) * availableScroll;
+    const newScrollPosition = (position / availableThumb) * availableScroll;
+    this.overflow.scrollTop = newScrollPosition;
+  }
+
+  smoothScroll = (position) => {
+    const availableScroll = this.overflow.scrollHeight - this.overflow.clientHeight;
+    const availableThumb = this.scrollbar.clientHeight - this.thumb.clientHeight;
+
+    const newScrollPosition = Math.ceil((position / availableThumb) * availableScroll);
+
+    let startTime = null;
+    const timeTotal = 500;
+
+    const move = (timestamp) => {
+      if (startTime === null) {
+        startTime = timestamp;
+      }
+
+      const timeElapsed = Math.floor(timestamp - startTime);
+      const timeRemaining = Math.floor(timeTotal - timeElapsed);
+
+      const currentPosition = this.overflow.scrollTop;
+      const targetPosition = newScrollPosition;
+      const distance = currentPosition - targetPosition;
+      const direction = position < this.startThumbTop ? 'Top' : 'Bottom';
+      const changeRate = Math.ceil(Math.abs(distance) / (timeTotal / 100));
+
+      if (timeRemaining > 0) {
+
+        if (direction === 'Top') {
+          if (currentPosition > targetPosition) {
+            this.overflow.scrollTop -= changeRate;
+          }
+        } else if (direction === 'Bottom') {
+          if (currentPosition < targetPosition) {
+            this.overflow.scrollTop += changeRate;
+          }
+        }
+
+        window.requestAnimationFrame(move);
+      }
+
+    };
+
+    window.requestAnimationFrame(move);
+
   }
 
   render() {
