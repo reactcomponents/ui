@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './ListPicker.css';
-import ScrollBar from '../ScrollBar/ScrollBar';
 
 class ListPicker extends Component {
   constructor(props) {
@@ -10,6 +9,7 @@ class ListPicker extends Component {
     this.label = null;
 
     this.lastScroll = null;
+    this.height = 50;
 
     this.state = {
       list: props.list || [],
@@ -32,63 +32,63 @@ class ListPicker extends Component {
     this.label = this.state.refs.label.current;
 
     this.overflow.addEventListener('scroll', this.handleScroll);
-    window.addEventListener('mouseup', this.handleScrollEnd);
-    window.addEventListener('touchend', this.handleScrollEnd);
   }
 
   handleScroll = () => {
     const { scrollTop } = this.overflow;
 
-    if (scrollTop > 0) {
-      this.label.setAttribute('data-isvisible', false);
-    } else {
-      this.label.setAttribute('data-isvisible', true);
-    }
+    const prevItem = Math.floor(scrollTop / this.height);
+    const nextItem = Math.ceil(scrollTop / this.height);
+    const isAboveMiddle = (scrollTop % this.height) > (this.height / 2);
+    const position = isAboveMiddle ? nextItem : prevItem;
 
-    const selectedItem = this.list.querySelector('.ListPicker__list__item[data-isselected="true"]');
+    this.label.setAttribute('data-isvisible', false);
+
+    let selectedItem = this.list.querySelector('.ListPicker__list__item[data-isselected="true"]');
     if (selectedItem) {
       selectedItem.setAttribute('data-isselected', 'false');
+      selectedItem.style.top = `${0}px`;
+    }
+
+    selectedItem = this.list.querySelectorAll('.ListPicker__list__item')[position];
+    if (selectedItem) {
+      selectedItem.setAttribute('data-isselected', 'true');
+      // selectedItem.style.top = `${scrollTop - (this.height * position)}px`;
     }
 
     if (this.lastScroll !== null) {
-
       setTimeout(() => {
-
         const scrollTime = new Date().getTime();
 
-        if (scrollTime - this.lastScroll >= 250) {
+        if (scrollTime - this.lastScroll >= 100) {
           this.handleScrollEnd();
         }
-
-      }, 250);
-
+      }, 100);
     }
 
     this.lastScroll = new Date().getTime();
-
   }
 
   handleScrollEnd = () => {
-    this.label.setAttribute('data-isvisible', true);
-
     const { scrollTop } = this.overflow;
 
-    const height = 50;
+    const prevItem = Math.floor(scrollTop / this.height);
+    const nextItem = Math.ceil(scrollTop / this.height);
+    const isAboveMiddle = (scrollTop % this.height) > (this.height / 2);
+    const position = isAboveMiddle ? nextItem : prevItem;
 
-    const position = (scrollTop % height) > (height / 2) ? Math.ceil(scrollTop / height) : Math.floor(scrollTop / height);
+    this.label.setAttribute('data-isvisible', true);
 
-    this.list.style.top = `${this.overflow.scrollTop - (height * position)}px`;
-
-    const selectedItem = this.list.querySelectorAll('.ListPicker__list__item')[position];
+    const selectedItem = this.list.querySelector('.ListPicker__list__item[data-isselected="true"]');
     if (selectedItem) {
-      selectedItem.setAttribute('data-isselected', 'true');
+      selectedItem.style.top = '0px';
     }
 
     this.setState({
       selectedIndex: position,
-      listTop: `${this.overflow.scrollTop - (height * position)}px`,
+      labelVisibility: true,
+      listTop: `${scrollTop - (this.height * position)}px`,
     });
-
   }
 
   render() {
@@ -99,7 +99,7 @@ class ListPicker extends Component {
 
         <div
           ref={this.state.refs.label}
-          className="ListPicker__list__label"
+          className="ListPicker__label"
           data-isvisible={this.state.labelVisibility}
           style={{
             textAlign: this.state.align,
@@ -107,11 +107,13 @@ class ListPicker extends Component {
         >
           <div className="label">{ this.state.label }</div>
         </div>
+
         <div
           ref={this.state.refs.overflow}
           className="ListPicker__overflow"
           data-scrollbar-element="overflow"
         >
+          <div className="ListPicker__padding" />
           <div
             ref={this.state.refs.list}
             className="ListPicker__list"
@@ -123,9 +125,9 @@ class ListPicker extends Component {
               this.state.list.map((item, index) => {
                 return (
                   <div
-                    key={index}
+                    key={`${item}_${index}`}
                     className="ListPicker__list__item"
-                    data-isselected={this.state.selectedIndex === index}
+                    data-isselected={index === this.state.selectedIndex}
                     style={{
                       textAlign: this.state.align,
                     }}
@@ -136,13 +138,9 @@ class ListPicker extends Component {
               })
             }
           </div>
+          <div className="ListPicker__padding" />
         </div>
 
-        <ScrollBar
-          onScrollEnd={() => {
-            console.log('Scroll Ended');
-          }}
-        />
       </div>
     );
   }
