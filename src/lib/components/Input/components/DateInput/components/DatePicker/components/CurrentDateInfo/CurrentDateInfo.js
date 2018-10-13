@@ -4,9 +4,7 @@ import './CurrentDateInfo.css';
 class CurrentDateInfo extends Component {
   constructor(props) {
     super(props);
-    const dateProp = props.date || new Date();
-
-    const monthsList = [
+    this.monthsList = [
       'January',
       'February',
       'March',
@@ -20,28 +18,33 @@ class CurrentDateInfo extends Component {
       'November',
       'December',
     ];
-
-    const date = dateProp.getDate();
-    const month = dateProp.getMonth();
-    const monthName = monthsList[month];
-    const year = dateProp.getFullYear();
-
-    this.state = {
-      date,
-      year,
-      monthName,
-    };
+    this.daysList = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
   }
 
   render() {
+    const {
+      date,
+      month,
+      year,
+      day,
+    } = this.props;
+
     return (
       <div className="CurrentDateInfo">
         <div className="CurrentDateInfo__date">
-          <div className="CurrentDateInfo__date__part">{ this.state.date }</div>/
-          <div className="CurrentDateInfo__date__part">{ this.state.monthName }</div>/
-          <div className="CurrentDateInfo__date__part">{ this.state.year }</div>
+          <div className="CurrentDateInfo__date__part">{ date }</div>/
+          <div className="CurrentDateInfo__date__part">{ this.monthsList[month] }</div>/
+          <div className="CurrentDateInfo__date__part">{ year }</div>
         </div>
-        <div className="CurrentDateInfo__day">Monday</div>
+        <div className="CurrentDateInfo__day">{ this.daysList[day] }</div>
       </div>
     );
   }

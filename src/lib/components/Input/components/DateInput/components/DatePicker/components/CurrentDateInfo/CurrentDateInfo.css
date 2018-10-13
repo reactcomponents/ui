@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: flex-start;
   color: #fff;
-  min-height: 100px;
+  min-height: 75px;
   padding-left: 15px;
   background-color: blue;
 }
@@ -13,15 +13,16 @@
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  font-size: 20px;
+  font-size: 18px;
   font-family: 'Roboto', sans-serif;
   font-weight: 300;
+  margin-top: -5px;
 }
 .CurrentDateInfo__date__part {
   font-weight: 500;
   letter-spacing: 0.5px;
-  padding: 3px 3px;
-  margin: 2px 2px;
+  padding: 3px;
+  margin: 2px;
   border-radius: 3px;
 }
 .CurrentDateInfo__day {
