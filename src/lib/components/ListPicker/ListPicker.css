@@ -1,6 +1,6 @@
 .ListPicker {
   position: relative;
-  height: 200px;
+  height: 175px;
   overflow: hidden;
 }
 
@@ -24,13 +24,13 @@
   align-items: center;
   position: relative;
   width: 100%;
-  transition: top 0.25s linear 0s;
+  transition: top 0.15s linear 0s;
 }
 
 .ListPicker__list__item {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
   position: relative;
   width: 100%;
   height: 50px;
@@ -40,67 +40,53 @@
   letter-spacing: 0px;
   text-align: left;
   padding: 0px 0px;
-  transition: top 0.25s linear 0s;
+  transition: color 0.15s linear 0s;
 }
 .ListPicker__list__item[data-isselected="false"] {
   color: #000;
-  top: 0px;
 }
 .ListPicker__list__item[data-isselected="true"] {
   color: blue;
-  top: 7px;
-}
-.ListPicker__list__item > .text {
-  padding: 0px 20px;
 }
 
-.ListPicker__label {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+.ListPicker__list__item > .text {
   position: relative;
-  height: 0px;
-  top: calc(50% - 18px);
-  opacity: 0;
-  z-index: 1;
+  padding: 0px 20px;
 }
-.ListPicker__label[data-isvisible="true"] {
-  opacity: 0.5;
-  transition: opacity 0.25s linear 0.25s;
+.ListPicker__list__item[data-isselected="false"] > .text {
+  top: 0px;
+  transition: top 0.25s linear 0.15s;
 }
-.ListPicker__label[data-isvisible="false"] {
-  opacity: 0;
-  transition: opacity 0.25s linear 0s;
+.ListPicker__list__item[data-isselected="true"] > .text {
+  top: 7px;
+  transition: top 0.25s linear 0s;
 }
-.ListPicker__label > .label {
+
+.ListPicker__list__item > .label {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  position: absolute;
+  text-align: left;
+  padding: 0px 20px;
+  margin-top: -7px;
+}
+.ListPicker__list__item[data-isselected="false"] > .label {
+  opacity: 0;
+  transition: opacity 0.15s linear 0s;
+}
+.ListPicker__list__item[data-isselected="true"] > .label {
+  opacity: 0.5;
+  transition: opacity 0.15s linear 0.25s;
+}
+.ListPicker__list__item > .label > .text {
   height: 15px;
   color: #000000;
   font-size: 10px;
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
   letter-spacing: 0.5px;
-  text-align: left;
   text-transform: uppercase;
-  padding: 0px 20px;
-}
-
-.ListPicker[data-align="center"] .ListPicker__label,
-.ListPicker[data-align="center"] .ListPicker__list__item {
-  justify-content: center;
-  text-align: center;
-}
-.ListPicker[data-align="left"] .ListPicker__label,
-.ListPicker[data-align="left"] .ListPicker__list__item {
-  justify-content: flex-start;
-  text-align: left;
-}
-.ListPicker[data-align="right"] .ListPicker__label,
-.ListPicker[data-align="right"] .ListPicker__list__item {
-  justify-content: flex-end;
-  text-align: right;
 }
 
 .ListPicker__gradient-overlay {
@@ -108,7 +94,7 @@
   left: 0px;
   width: 100%;
   height: 100%;
-  box-shadow: 0px 0px 75px 50px #fff;
+  box-shadow: 0px 0px 35px 35px #fff;
   z-index: 1;
 }
 .ListPicker__gradient-overlay--top {
@@ -116,4 +102,22 @@
 }
 .ListPicker__gradient-overlay--bottom {
   bottom: -100%;
+}
+
+.ListPicker__selection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+.ListPicker__selection > .box {
+  position: absolute;
+  width: 105%;
+  height: 50px;
+  box-shadow: inset 0px 3px 0px -1px blue,
+    inset 0px -3px 0px -1px blue;
 }

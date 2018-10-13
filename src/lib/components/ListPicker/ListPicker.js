@@ -8,16 +8,20 @@ class ListPicker extends Component {
     this.list = null;
     this.label = null;
 
+    this.isSmoothScrolling = false;
     this.lastScroll = null;
     this.height = 50;
 
-    this.position = 0;
+    const list = props.list || [];
+
+    this.defaultValue = (props.defaultValue !== undefined) ? props.defaultValue : null;
+    this.position = list.findIndex(value => value === this.defaultValue);
+
+    this.onChange = props.onChange;
 
     this.state = {
-      list: props.list || [],
-      align: props.align || 'left',
+      list,
       label: props.label || null,
-      labelVisibility: true,
       selectedIndex: this.position,
       listTop: 0,
       refs: {
@@ -29,32 +33,77 @@ class ListPicker extends Component {
   }
 
   componentDidMount() {
-    this.overflow = this.state.refs.overflow.current;
-    this.list = this.state.refs.list.current;
-    this.label = this.state.refs.label.current;
+    const { refs } = this.state;
+
+    this.overflow = refs.overflow.current;
+    this.list = refs.list.current;
+    this.label = refs.label.current;
 
     this.overflow.addEventListener('scroll', this.handleScroll);
+
+    setTimeout(() => {
+      this.smoothScroll(this.position * this.height, 1000);
+    }, 3000);
+  }
+
+  smoothScroll = (target, duration) => {
+
+    this.isSmoothScrolling = true;
+
+    const ticks = (duration / 1000) * 60;
+    const jump = Math.ceil(Math.abs(this.overflow.scrollTop - target) / ticks);
+
+    let start = null;
+
+    const scroll = (timestamp) => {
+      if (!start) {
+        start = timestamp;
+      }
+
+      const { scrollTop } = this.overflow;
+      const timePassed = timestamp - start;
+
+      const factor = (Math.abs(scrollTop - target) < jump) ? Math.abs(scrollTop - target) : jump;
+
+      if (scrollTop < target) {
+        this.overflow.scrollTop = this.overflow.scrollTop + factor;
+      } else if (scrollTop > target) {
+        this.overflow.scrollTop = this.overflow.scrollTop - factor;
+      }
+
+      if (scrollTop === target && timePassed > duration) {
+        this.isSmoothScrolling = false;
+        this.handleScroll();
+      } else {
+        window.requestAnimationFrame(scroll);
+      }
+    };
+
+    window.requestAnimationFrame(scroll);
   }
 
   handleScroll = () => {
+    if (this.isSmoothScrolling) {
+      return undefined;
+    }
+
     const { scrollTop } = this.overflow;
 
     const prevItem = Math.floor(scrollTop / this.height);
     const nextItem = Math.ceil(scrollTop / this.height);
-    const isAboveMiddle = (scrollTop % this.height) > (this.height / 2) - 5;
+    const isAboveMiddle = (scrollTop % this.height) > (this.height / 2);
     this.position = isAboveMiddle ? nextItem : prevItem;
 
-    this.label.setAttribute('data-isvisible', false);
+    if (typeof this.onChange === 'function') {
+      this.onChange(this.state.list[this.position], this.position);
+    }
 
-    let selectedItem = this.list.querySelector('.ListPicker__list__item[data-isselected="true"]');
+    const selectedItem = this.list.querySelector('.ListPicker__list__item[data-isselected="true"]');
     if (selectedItem) {
       selectedItem.setAttribute('data-isselected', 'false');
     }
 
-    selectedItem = this.list.querySelectorAll('.ListPicker__list__item')[this.position];
-    if (selectedItem) {
-      selectedItem.setAttribute('data-isselected', 'true');
-    }
+    this.list.style.top = `${this.overflow.scrollTop - (this.height * this.position)}px`;
 
     if (this.lastScroll !== null) {
       setTimeout(() => {
@@ -64,19 +113,29 @@ class ListPicker extends Component {
           this.handleScrollEnd();
         }
       }, 100);
+    } else {
+      if (selectedItem) {
+        selectedItem.setAttribute('data-isselected', 'true');
+      }
     }
 
     this.lastScroll = new Date().getTime();
   }
 
   handleScrollEnd = () => {
-    this.label.setAttribute('data-isvisible', true);
+    if (typeof this.onChange === 'function') {
+      this.onChange(this.state.list[this.position], this.position);
+    }
 
-    this.setState({
-      selectedIndex: this.position,
-      labelVisibility: true,
-      listTop: `${this.overflow.scrollTop - (this.height * this.position)}px`,
-    });
+    const selectedItem = this.list.querySelectorAll('.ListPicker__list__item')[this.position];
+    if (selectedItem) {
+      selectedItem.setAttribute('data-isselected', 'true');
+    }
+
+    // this.setState({
+    //   selectedIndex: this.position,
+    //   listTop: `${this.overflow.scrollTop - (this.height * this.position)}px`,
+    // });
   }
 
   render() {
@@ -85,15 +144,8 @@ class ListPicker extends Component {
         <div className="ListPicker__gradient-overlay ListPicker__gradient-overlay--top" />
         <div className="ListPicker__gradient-overlay ListPicker__gradient-overlay--bottom" />
 
-        <div
-          ref={this.state.refs.label}
-          className="ListPicker__label"
-          data-isvisible={this.state.labelVisibility}
-          style={{
-            textAlign: this.state.align,
-          }}
-        >
-          <div className="label">{ this.state.label }</div>
+        <div className="ListPicker__selection">
+          <div className="box" />
         </div>
 
         <div
@@ -112,15 +164,20 @@ class ListPicker extends Component {
             {
               this.state.list.map((item, index) => {
                 const key = `${item}_${index}`;
+                const isSelectedItem = index === this.state.selectedIndex;
                 return (
                   <div
                     key={key}
                     className="ListPicker__list__item"
-                    data-isselected={index === this.state.selectedIndex}
-                    style={{
-                      textAlign: this.state.align,
-                    }}
+                    data-isselected={isSelectedItem}
                   >
+                    {
+                      this.state.label && (
+                        <div className="label">
+                          <div className="text">{ this.state.label }</div>
+                        </div>
+                      )
+                    }
                     <div className="text">{ item }</div>
                   </div>
                 );
