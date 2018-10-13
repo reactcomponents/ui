@@ -105,11 +105,7 @@ class ListPicker extends Component {
 
     }
   }
-
-  handleKeyPress = (event) => {
-    console.log(event);
-  }
-
+  
   render() {
     return (
       <div className="ListPicker">
