@@ -6,13 +6,13 @@ class ListPicker extends Component {
     super(props);
     this.overflow = null;
     this.list = null;
-    this.label = null;
 
     this.isSmoothScrolling = false;
     this.lastScroll = null;
     this.height = 50;
 
     const list = props.list || [];
+    this.listTop = 0;
 
     this.defaultValue = (props.defaultValue !== undefined) ? props.defaultValue : null;
     this.position = list.findIndex(value => value === this.defaultValue);
@@ -23,7 +23,6 @@ class ListPicker extends Component {
       list,
       label: props.label || null,
       selectedIndex: this.position,
-      listTop: 0,
       refs: {
         overflow: React.createRef(),
         list: React.createRef(),
@@ -37,17 +36,14 @@ class ListPicker extends Component {
 
     this.overflow = refs.overflow.current;
     this.list = refs.list.current;
-    this.label = refs.label.current;
 
     this.overflow.addEventListener('scroll', this.handleScroll);
 
-    setTimeout(() => {
-      this.smoothScroll(this.position * this.height, 1000);
-    }, 3000);
+    // Initial Scroll Position based on DefaultValue
+    this.overflow.scrollTop = this.position * this.height;
   }
 
   smoothScroll = (target, duration) => {
-
     this.isSmoothScrolling = true;
 
     const ticks = (duration / 1000) * 60;
@@ -83,59 +79,35 @@ class ListPicker extends Component {
   }
 
   handleScroll = () => {
-    if (this.isSmoothScrolling) {
-      return undefined;
-    }
+    if (!this.isSmoothScrolling) {
 
-    const { scrollTop } = this.overflow;
+      const { scrollTop } = this.overflow;
 
-    const prevItem = Math.floor(scrollTop / this.height);
-    const nextItem = Math.ceil(scrollTop / this.height);
-    const isAboveMiddle = (scrollTop % this.height) > (this.height / 2);
-    this.position = isAboveMiddle ? nextItem : prevItem;
+      const prevItem = Math.floor(scrollTop / this.height);
+      const nextItem = Math.ceil(scrollTop / this.height);
+      const isAboveMiddle = (scrollTop % this.height) > (this.height / 2) + 5;
+      this.position = isAboveMiddle ? nextItem : prevItem;
 
-    if (typeof this.onChange === 'function') {
-      this.onChange(this.state.list[this.position], this.position);
-    }
+      const index = this.position;
+      const value = this.state.list[index];
 
-    const selectedItem = this.list.querySelector('.ListPicker__list__item[data-isselected="true"]');
-    if (selectedItem) {
-      selectedItem.setAttribute('data-isselected', 'false');
-    }
+      const previousItem = this.list.querySelector('.ListPicker__list__item[data-isselected="true"]');
+      if (previousItem) previousItem.setAttribute('data-isselected', 'false');
 
-    this.list.style.top = `${this.overflow.scrollTop - (this.height * this.position)}px`;
+      const currentItem = this.list.querySelectorAll('.ListPicker__list__item')[index];
+      if (currentItem) currentItem.setAttribute('data-isselected', 'true');
 
-    if (this.lastScroll !== null) {
-      setTimeout(() => {
-        const scrollTime = new Date().getTime();
+      this.list.style.top = `${scrollTop - (this.height * this.position)}px`;
 
-        if (scrollTime - this.lastScroll >= 100) {
-          this.handleScrollEnd();
-        }
-      }, 100);
-    } else {
-      if (selectedItem) {
-        selectedItem.setAttribute('data-isselected', 'true');
+      if (typeof this.onChange === 'function') {
+        this.onChange(value, index);
       }
-    }
 
-    this.lastScroll = new Date().getTime();
+    }
   }
 
-  handleScrollEnd = () => {
-    if (typeof this.onChange === 'function') {
-      this.onChange(this.state.list[this.position], this.position);
-    }
-
-    const selectedItem = this.list.querySelectorAll('.ListPicker__list__item')[this.position];
-    if (selectedItem) {
-      selectedItem.setAttribute('data-isselected', 'true');
-    }
-
-    // this.setState({
-    //   selectedIndex: this.position,
-    //   listTop: `${this.overflow.scrollTop - (this.height * this.position)}px`,
-    // });
+  handleKeyPress = (event) => {
+    console.log(event);
   }
 
   render() {
@@ -148,35 +120,18 @@ class ListPicker extends Component {
           <div className="box" />
         </div>
 
-        <div
-          ref={this.state.refs.overflow}
-          className="ListPicker__overflow"
-          data-scrollbar-element="overflow"
-        >
+        <div ref={this.state.refs.overflow} className="ListPicker__overflow">
           <div className="ListPicker__padding" />
-          <div
-            ref={this.state.refs.list}
-            className="ListPicker__list"
-            style={{
-              top: this.state.listTop,
-            }}
-          >
+          <div ref={this.state.refs.list} className="ListPicker__list" style={{ top: this.listTop }}>
             {
               this.state.list.map((item, index) => {
                 const key = `${item}_${index}`;
                 const isSelectedItem = index === this.state.selectedIndex;
+
                 return (
-                  <div
-                    key={key}
-                    className="ListPicker__list__item"
-                    data-isselected={isSelectedItem}
-                  >
+                  <div key={key} className="ListPicker__list__item" data-isselected={isSelectedItem}>
                     {
-                      this.state.label && (
-                        <div className="label">
-                          <div className="text">{ this.state.label }</div>
-                        </div>
-                      )
+                      this.state.label && (<div className="label">{ this.state.label }</div>)
                     }
                     <div className="text">{ item }</div>
                   </div>

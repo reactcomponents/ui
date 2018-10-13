@@ -54,12 +54,12 @@
   padding: 0px 20px;
 }
 .ListPicker__list__item[data-isselected="false"] > .text {
-  top: 0px;
-  transition: top 0.25s linear 0.15s;
+  margin-top: 0px;
+  transition: margin-top 0.25s linear 0.15s;
 }
 .ListPicker__list__item[data-isselected="true"] > .text {
-  top: 7px;
-  transition: top 0.25s linear 0s;
+  margin-top: 15px;
+  transition: margin-top 0.25s linear 0s;
 }
 
 .ListPicker__list__item > .label {
@@ -67,9 +67,16 @@
   justify-content: flex-start;
   align-items: center;
   position: absolute;
+  height: 15px;
+  color: #000000;
+  font-size: 10px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.5px;
   text-align: left;
+  text-transform: uppercase;
   padding: 0px 20px;
-  margin-top: -7px;
+  margin-top: -8px;
 }
 .ListPicker__list__item[data-isselected="false"] > .label {
   opacity: 0;
@@ -78,15 +85,6 @@
 .ListPicker__list__item[data-isselected="true"] > .label {
   opacity: 0.5;
   transition: opacity 0.15s linear 0.25s;
-}
-.ListPicker__list__item > .label > .text {
-  height: 15px;
-  color: #000000;
-  font-size: 10px;
-  font-family: 'Roboto', sans-serif;
-  font-weight: 400;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
 }
 
 .ListPicker__gradient-overlay {
