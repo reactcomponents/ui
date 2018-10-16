@@ -57,7 +57,7 @@
   margin-top: 0px;
   transition: margin-top 0.25s linear 0.15s;
 }
-.ListPicker__list__item[data-isselected="true"] > .text {
+.ListPicker[data-haslabel="true"] .ListPicker__list__item[data-isselected="true"] > .text {
   margin-top: 15px;
   transition: margin-top 0.25s linear 0s;
 }
@@ -82,7 +82,7 @@
   opacity: 0;
   transition: opacity 0.15s linear 0s;
 }
-.ListPicker__list__item[data-isselected="true"] > .label {
+.ListPicker[data-haslabel="true"] .ListPicker__list__item[data-isselected="true"] > .label {
   opacity: 0.5;
   transition: opacity 0.15s linear 0.25s;
 }

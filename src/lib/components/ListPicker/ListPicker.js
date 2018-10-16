@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './ListPicker.css';
 
 class ListPicker extends Component {
@@ -11,22 +12,15 @@ class ListPicker extends Component {
     this.lastScroll = null;
     this.height = 50;
 
-    const list = props.list || [];
-    this.listTop = 0;
-
-    this.defaultValue = (props.defaultValue !== undefined) ? props.defaultValue : null;
-    this.position = list.findIndex(value => value === this.defaultValue);
-
-    this.onChange = props.onChange;
+    this.lastPosition = null;
+    this.position = props.list.findIndex(value => value === props.defaultValue);
 
     this.state = {
-      list,
-      label: props.label || null,
+      list: props.list,
       selectedIndex: this.position,
       refs: {
         overflow: React.createRef(),
         list: React.createRef(),
-        label: React.createRef(),
       },
     };
   }
@@ -99,16 +93,25 @@ class ListPicker extends Component {
 
       this.list.style.top = `${scrollTop - (this.height * this.position)}px`;
 
-      if (typeof this.onChange === 'function') {
-        this.onChange(value, index);
+      if (this.position !== this.lastPosition) {
+        this.lastPosition = this.position;
+        this.props.onChange(value, index);
       }
 
     }
   }
-  
+
   render() {
+    const { label } = this.props;
+    const {
+      selectedIndex,
+      refs,
+    } = this.state;
+
+    const hasLabel = label.trim() !== '';
+
     return (
-      <div className="ListPicker">
+      <div className="ListPicker" data-haslabel={hasLabel}>
         <div className="ListPicker__gradient-overlay ListPicker__gradient-overlay--top" />
         <div className="ListPicker__gradient-overlay ListPicker__gradient-overlay--bottom" />
 
@@ -116,19 +119,21 @@ class ListPicker extends Component {
           <div className="box" />
         </div>
 
-        <div ref={this.state.refs.overflow} className="ListPicker__overflow">
+        <div ref={refs.overflow} className="ListPicker__overflow">
           <div className="ListPicker__padding" />
-          <div ref={this.state.refs.list} className="ListPicker__list" style={{ top: this.listTop }}>
+          <div ref={refs.list} className="ListPicker__list">
             {
               this.state.list.map((item, index) => {
                 const key = `${item}_${index}`;
-                const isSelectedItem = index === this.state.selectedIndex;
+                const isSelectedItem = index === selectedIndex;
 
                 return (
-                  <div key={key} className="ListPicker__list__item" data-isselected={isSelectedItem}>
-                    {
-                      this.state.label && (<div className="label">{ this.state.label }</div>)
-                    }
+                  <div
+                    key={key}
+                    className="ListPicker__list__item"
+                    data-isselected={isSelectedItem}
+                  >
+                    <div className="label">{ label }</div>
                     <div className="text">{ item }</div>
                   </div>
                 );
@@ -142,5 +147,27 @@ class ListPicker extends Component {
   }
 
 }
+
+ListPicker.propTypes = {
+  label: PropTypes.string,
+  list: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
+  ),
+  defaultValue: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
+  onChange: PropTypes.func,
+};
+
+ListPicker.defaultProps = {
+  label: '',
+  list: [],
+  defaultValue: '',
+  onChange: () => {},
+};
 
 export default ListPicker;
