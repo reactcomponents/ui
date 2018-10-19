@@ -6,6 +6,7 @@ import {
   CheckBox,
   Radio,
   Range,
+  DateInput,
 } from '../..';
 
 class Input extends Component {
@@ -105,6 +106,17 @@ class Input extends Component {
             name={this.state.name}
             onChange={this.handleInput}
             onChangeWatch={this.state.onChangeWatch}
+          />
+        );
+
+      case 'date':
+        return (
+          <DateInput
+            name={this.state.name}
+            label={this.state.label}
+            placeholder={this.state.placeholder}
+            value={this.state.value}
+            onChange={this.handleInput}
           />
         );
 
