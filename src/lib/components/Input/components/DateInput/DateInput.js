@@ -8,8 +8,8 @@ import DatePicker from './components/DatePicker/DatePicker';
 class DateInput extends Component {
   constructor(props) {
     super(props);
+    this.id = uuidv4();
     this.state = {
-      id: uuidv4(),
       value: props.value,
       status: {
         isFocused: false,
@@ -39,11 +39,24 @@ class DateInput extends Component {
   }
 
   handleInput = (input) => {
+    const {
+      date,
+      month,
+      year,
+    } = input;
+
+    const displayValue = new Date(year, month, date).toDateString();
+
     this.setState({
-      value: input,
+      value: displayValue,
+      status: {
+        ...this.state.status,
+        isDatePickerVisible: false,
+      },
     });
-    this.props.onChange(input);
-    this.props.__onChange(input);
+
+    this.props.onChange(this.props.name, input);
+    this.props.__onChange(this.props.name, input);
   }
 
   showDatePicker = () => {
@@ -55,6 +68,15 @@ class DateInput extends Component {
     });
   }
 
+  hideDatePicker = () => {
+    this.setState({
+      status: {
+        ...this.state.status,
+        isDatePickerVisible: false,
+      },
+    });
+  }
+
   render() {
     const {
       label,
@@ -62,21 +84,34 @@ class DateInput extends Component {
     } = this.props;
 
     const {
-      id,
       value,
       status,
     } = this.state;
 
     return (
-      <div className="DateInput" data-isfocused={status.isFocused} data-isselected={value !== ''}>
+      <div
+        className="DateInput"
+        data-isfocused={status.isFocused}
+        data-isselected={value !== ''}
+      >
         <div className="DateInput__overlay">
           <div className="DateInput__overlay__color DateInput__overlay__color--dark" />
           <div className="DateInput__overlay__color DateInput__overlay__color--white" />
         </div>
 
-        <label htmlFor={id} className="DateInput__label" onMouseDown={this.showDatePicker}>{ label }</label>
+        <label
+          htmlFor={this.id}
+          className="DateInput__label"
+          onMouseDown={this.showDatePicker}
+        >
+          { label }
+        </label>
 
-        <div className="DateInput__input" data-isfocused={status.isFocused} onMouseDown={this.showDatePicker}>
+        <div
+          className="DateInput__input"
+          data-isfocused={status.isFocused}
+          onMouseDown={this.showDatePicker}
+        >
           <div className="DateInput__input__icon">
             <div className="icon" />
           </div>
@@ -89,7 +124,11 @@ class DateInput extends Component {
           <Modal
             isVisible={status.isDatePickerVisible}
             content={
-              <DatePicker onChange={this.handleInput} />
+              <DatePicker
+                value={!value ? new Date() : new Date(value)}
+                onChange={this.handleInput}
+                onCancel={this.hideDatePicker}
+              />
             }
           />
         </div>
@@ -103,7 +142,7 @@ DateInput.propTypes = {
   name: PropTypes.string,
   label: PropTypes.string,
   placeholder: PropTypes.string,
-  value: PropTypes.string,
+  // value: PropTypes.any,
   onChange: PropTypes.func,
   __onChange: PropTypes.func,
   __onInit: PropTypes.func,
@@ -113,7 +152,7 @@ DateInput.defaultProps = {
   name: '',
   label: '',
   placeholder: '',
-  value: '',
+  // value: '',
   onChange: () => {},
   __onChange: () => {},
   __onInit: () => {},

@@ -3,6 +3,7 @@ import PropsTypes from 'prop-types';
 import './DatePicker.css';
 import CurrentDateInfo from './components/CurrentDateInfo/CurrentDateInfo';
 import ListPicker from '../../../../../ListPicker/ListPicker';
+import Button from '../../../../../Button/Button';
 
 class DatePicker extends Component {
   constructor(props) {
@@ -36,10 +37,10 @@ class DatePicker extends Component {
     };
 
     this.state = {
-      date: 5,
-      month: 5,
-      year: 1970,
-      day: 0,
+      date: props.value.getDate(),
+      month: props.value.getMonth(),
+      year: props.value.getFullYear(),
+      day: props.value.getDay(),
     };
   }
 
@@ -72,8 +73,12 @@ class DatePicker extends Component {
     dateValues.dayName = this.list.daysOfWeek[dateValues.day];
     dateValues.monthName = this.list.months[month];
 
-    this.props.onChange(dateValues);
     this.setState(dateValues);
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    this.props.onChange(this.state);
   }
 
   render() {
@@ -85,6 +90,11 @@ class DatePicker extends Component {
     } = this.state;
 
     const monthName = this.list.months[month];
+
+    const buttonStyles = {
+      color: '14px',
+      padding: '10px 15px',
+    };
 
     return (
       <div className="DatePicker">
@@ -119,7 +129,8 @@ class DatePicker extends Component {
         </div>
 
         <div className="DatePicker__buttons">
-          {/* Create Action Button */}
+          <Button style={buttonStyles} onClick={this.props.onCancel}>Cancel</Button>
+          <Button style={buttonStyles} onClick={this.handleSubmit}>Set</Button>
         </div>
       </div>
     );
@@ -128,11 +139,15 @@ class DatePicker extends Component {
 }
 
 DatePicker.propTypes = {
+  value: PropsTypes.instanceOf(Date),
   onChange: PropsTypes.func,
+  onCancel: PropsTypes.func,
 };
 
 DatePicker.defaultProps = {
+  value: new Date(),
   onChange: () => {},
+  onCancel: () => {},
 };
 
 export default DatePicker;
