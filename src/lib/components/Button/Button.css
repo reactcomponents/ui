@@ -1,0 +1,44 @@
+.Button {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.Button__overlay {
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  background-color: #000000;
+  opacity: 0;
+  transition: opacity 0.25s ease 0s;
+}
+.Button__overlay[data-color="white"] {
+  background-color: #fff;
+}
+
+.Button:hover .Button__overlay {
+  opacity: 0.1;
+}
+.Button:hover .Button__overlay[data-color="white"] {
+  opacity: 0.15;
+}
+
+.Button__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 12.5px 25px;
+}
+.Button__content {
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
