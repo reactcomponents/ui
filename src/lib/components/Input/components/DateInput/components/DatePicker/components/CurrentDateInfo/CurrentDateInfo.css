@@ -14,7 +14,7 @@
   align-items: center;
   flex-wrap: wrap;
   font-size: 18px;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
   font-weight: 300;
   margin-top: -5px;
 }
@@ -27,6 +27,7 @@
 }
 .CurrentDateInfo__day {
   font-size: 12px;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
   letter-spacing: 1px;
   text-align: center;
   text-transform: uppercase;

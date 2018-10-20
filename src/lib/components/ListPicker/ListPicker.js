@@ -34,7 +34,9 @@ class ListPicker extends Component {
     this.overflow.addEventListener('scroll', this.handleScroll);
 
     // Initial Scroll Position based on DefaultValue
-    this.overflow.scrollTop = this.position * this.height;
+    setTimeout(() => {
+      this.overflow.scrollTop = this.position * this.height;
+    }, 0);
   }
 
   smoothScroll = (target, duration) => {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import uuidv4 from 'uuid/v4';
 import './DateInput.css';
-import Modal from '../../../Modal/components/Modal/Modal';
+import Modal from '../../../Modal/Modal';
 import DatePicker from './components/DatePicker/DatePicker';
 
 class DateInput extends Component {
@@ -123,14 +123,14 @@ class DateInput extends Component {
         <div className="DateInput__selector">
           <Modal
             isVisible={status.isDatePickerVisible}
-            content={
-              <DatePicker
-                value={!value ? new Date() : new Date(value)}
-                onChange={this.handleInput}
-                onCancel={this.hideDatePicker}
-              />
-            }
-          />
+            onHide={this.hideDatePicker}
+          >
+            <DatePicker
+              value={!value ? new Date() : new Date(value)}
+              onChange={this.handleInput}
+              onCancel={this.hideDatePicker}
+            />
+          </Modal>
         </div>
       </div>
     );

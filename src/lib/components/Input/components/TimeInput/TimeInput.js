@@ -13,7 +13,7 @@ class TimeInput extends Component {
       value: props.value,
       status: {
         isFocused: false,
-        isDatePickerVisible: false,
+        isTimePickerVisible: false,
       },
     };
 
@@ -52,7 +52,7 @@ class TimeInput extends Component {
       value: displayValue,
       status: {
         ...this.state.status,
-        isDatePickerVisible: false,
+        isTimePickerVisible: false,
       },
     });
 
@@ -60,20 +60,20 @@ class TimeInput extends Component {
     this.props.__onChange(this.props.name, input);
   }
 
-  showDatePicker = () => {
+  showTimePicker = () => {
     this.setState({
       status: {
         ...this.state.status,
-        isDatePickerVisible: true,
+        isTimePickerVisible: true,
       },
     });
   }
 
-  hideDatePicker = () => {
+  hideTimePicker = () => {
     this.setState({
       status: {
         ...this.state.status,
-        isDatePickerVisible: false,
+        isTimePickerVisible: false,
       },
     });
   }
@@ -103,7 +103,7 @@ class TimeInput extends Component {
         <label
           htmlFor={this.id}
           className="TimeInput__label"
-          onMouseDown={this.showDatePicker}
+          onMouseDown={this.showTimePicker}
         >
           { label }
         </label>
@@ -111,7 +111,7 @@ class TimeInput extends Component {
         <div
           className="TimeInput__input"
           data-isfocused={status.isFocused}
-          onMouseDown={this.showDatePicker}
+          onMouseDown={this.showTimePicker}
         >
           <div className="TimeInput__input__icon">
             <div className="icon" />
@@ -123,14 +123,13 @@ class TimeInput extends Component {
 
         <div className="TimeInput__selector">
           <Modal
-            isVisible={status.isDatePickerVisible}
-            onShow={this.showDatePicker}
-            onHide={this.hideDatePicker}
+            isVisible={status.isTimePickerVisible}
+            onHide={this.hideTimePicker}
           >
             <TimePicker
               value={!value ? new Date() : new Date(value)}
               onChange={this.handleInput}
-              onCancel={this.hideDatePicker}
+              onCancel={this.hideTimePicker}
             />
           </Modal>
         </div>
