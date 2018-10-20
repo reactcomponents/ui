@@ -1,0 +1,40 @@
+.ModalHeaderCloseIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+.ModalHeaderCloseIcon > .icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  transform: scale(0.35);
+  transition: transform 0.15s ease-in-out 0s;
+}
+.ModalHeaderCloseIcon:active > .icon {
+  transform: scale(0.5);
+}
+.ModalHeaderCloseIcon > .icon > .line {
+  position: absolute;
+  top: 0px;
+  width: 3px;
+  height: 40px;
+  background-color: #fff;
+}
+.ModalHeaderCloseIcon > .icon > .line:nth-child(1) {
+  transform: rotate(-45deg);
+}
+.ModalHeaderCloseIcon > .icon > .line:nth-child(2) {
+  transform: rotate(45deg);
+}
+.Modal[data-type="WARN"] .ModalHeaderCloseIcon > .icon > .line {
+  background-color: #000;
+}
+.ModalHeader-dupe .ModalHeaderCloseIcon > .icon > .line {
+  background-color: #000;
+}
