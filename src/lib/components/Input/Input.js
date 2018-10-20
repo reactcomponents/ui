@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import './Input.css';
 import {
   TextInput,
@@ -7,22 +8,23 @@ import {
   Radio,
   Range,
   DateInput,
+  TimeInput,
 } from '../..';
 
 class Input extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      type: props.type || 'text',
+      type: props.type,
       name: props.name,
-      label: props.label || '',
-      placeholder: props.placeholder || '',
+      label: props.label,
+      placeholder: props.placeholder,
       options: props.options || [],
-      value: props.value || '',
-      onChange: props.onChange || (() => { }),
-      onChangeWatch: props.onChangeWatch || (() => { }),
-      __onChange: props.__onChange || (() => { }),
-      __onInit: props.__onInit || (() => { }),
+      value: props.value,
+      onChange: props.onChange,
+      onChangeWatch: props.onChangeWatch,
+      __onChange: props.__onChange,
+      __onInit: props.__onInit,
     };
   }
 
@@ -44,6 +46,7 @@ class Input extends Component {
       'number',
       'password',
       'date',
+      'time',
       'search',
 
       'select',
@@ -120,6 +123,17 @@ class Input extends Component {
           />
         );
 
+      case 'time':
+        return (
+          <TimeInput
+            name={this.state.name}
+            label={this.state.label}
+            placeholder={this.state.placeholder}
+            value={this.state.value}
+            onChange={this.handleInput}
+          />
+        );
+
       default:
         return (
           <TextInput
@@ -135,5 +149,27 @@ class Input extends Component {
   }
 
 }
+
+Input.propTypes = {
+  type: PropTypes.string,
+  name: PropTypes.string,
+  placeholder: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  onChangeWatch: PropTypes.func,
+  __onChange: PropTypes.func,
+  __onInit: PropTypes.func,
+};
+
+Input.defaultProps = {
+  type: 'text',
+  name: 'unnamed',
+  placeholder: null,
+  value: null,
+  onChange: () => { },
+  onChangeWatch: () => { },
+  __onChange: () => { },
+  __onInit: () => { },
+};
 
 export default Input;
