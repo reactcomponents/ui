@@ -1,0 +1,31 @@
+.TimePicker {  
+  background-color: #ffffff;
+}
+
+.TimePicker__list {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  height: 175px;
+  background-color: #ffffff;
+}
+
+.TimePicker__picker__column-divider {
+  width: 1px;
+  height: 100%;
+  opacity: 0.15;
+  margin-left: -1px;
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&1+0,0+100 */
+  background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+  background: -webkit-radial-gradient(center, ellipse cover, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.TimePicker__buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
