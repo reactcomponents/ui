@@ -7,6 +7,7 @@ import CheckBox from './components/Input/components/CheckBox/CheckBox';
 import Radio from './components/Input/components/Radio/Radio';
 import Range from './components/Input/components/Range/Range';
 import DateInput from './components/Input/components/DateInput/DateInput';
+import TimeInput from './components/Input/components/TimeInput/TimeInput';
 
 export {
   Form,
@@ -17,5 +18,7 @@ export {
   CheckBox,
   Radio,
   Range,
+
   DateInput,
+  TimeInput,
 };

@@ -14,8 +14,7 @@ version: `0.0.1`
 - Range
 - Select
 - TextInput
-
-Components under development
-
 - DateInput
 - TimeInput
+
+- Modal
